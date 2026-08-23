@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getNotes } from "./api";
 export default function Page() {
   const [notes, setNotes] = useState<File | null>(null);
   const [error, setError] = useState("");
@@ -24,6 +25,10 @@ export default function Page() {
       setNotes(null);
       setError("Please select a valid PDF or Word document.");
     }
+  };
+  const handleGetNotes = async () => {
+    const response = await getNotes();
+    console.log(response);
   };
 
   return (
@@ -57,6 +62,12 @@ export default function Page() {
         {notes && (
           <p className="mt-4 text-success">Selected file: {notes.name}</p>
         )}
+        <button
+          className="mt-4 border-2 border-black/70 text-black px-4 py-2 rounded-md"
+          onClick={handleGetNotes}
+        >
+          Get Notes
+        </button>
       </main>
     </div>
   );
