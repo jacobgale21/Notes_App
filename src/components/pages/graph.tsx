@@ -3,6 +3,7 @@ import { useState } from "react";
 import { NotesCanvas } from "../UI/Graph/NotesCanvas";
 // import { Inspector } from "./Inspector";
 import type { Section, Relation } from "../../data/placeholder";
+import Inspector from "../UI/Graph/Inspector";
 
 export function GraphView({
   sections,
@@ -16,7 +17,7 @@ export function GraphView({
 
   return (
     <ReactFlowProvider>
-      <div className="flex min-h-screen">
+      <div className="flex min-h-[calc(100vh-4rem)]">
         <div className="min-w-0 flex-1">
           <NotesCanvas
             sections={sections}
@@ -24,7 +25,13 @@ export function GraphView({
             onSelect={setSelectedId}
           />
         </div>
-        {/* {selected && <Inspector section={selected} />} */}
+        {selected ? (
+          <Inspector section={selected} />
+        ) : (
+          <aside className="flex w-80 shrink-0 items-center justify-center border-l border-line bg-card px-6 text-center text-sm text-muted">
+            Select a section to read it
+          </aside>
+        )}
       </div>
     </ReactFlowProvider>
   );

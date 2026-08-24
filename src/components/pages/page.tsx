@@ -1,17 +1,12 @@
 import { useState } from "react";
 import { getNotes } from "../../api";
 import { UploadCloud, FileText } from "lucide-react";
-import type { Section, Relation } from "../../data/placeholder";
-import { demoSections, demoRelations } from "../../data/placeholder";
-import { GraphView } from "./graph";
 import "@xyflow/react/dist/style.css";
 
 export default function Page() {
   const [notes, setNotes] = useState<File | null>(null);
   const [error, setError] = useState("");
   const [selectedTab, setSelectedTab] = useState("upload");
-  const [sections, setSections] = useState<Section[] | null>(demoSections);
-  const [relations, setRelations] = useState<Relation[]>(demoRelations);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
