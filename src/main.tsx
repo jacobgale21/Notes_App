@@ -7,12 +7,14 @@ import NavBar from "./components/UI/navBar";
 import Page from "./components/pages/page";
 import { GraphView } from "./components/pages/graph";
 import { demoSections, demoRelations } from "./data/placeholder";
+import Home from "./components/pages/home";
 createRoot(document.querySelector("#app")!).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
         <Route element={<NavBar />}>
-          <Route path="/" element={<Page />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/upload" element={<Page />} />
           <Route
             path="/graph"
             element={

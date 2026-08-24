@@ -1,4 +1,4 @@
-import type { Relation, Section } from "../components/pages/graph";
+import type { Relation, Section } from "../data/placeholder";
 
 export function toFlow(sections: Section[], relations: Relation[]) {
   const nodes = sections.map((section, i) => ({
