@@ -6,8 +6,7 @@
   --sans: system-ui, "Segoe UI", Roboto, sans-serif;
   --heading: system-ui, "Segoe UI", Roboto, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
-
-  font: 18px/145% var(--sans);
+  --cursive: "Indie Flower", cursive;
   letter-spacing: 0.18px;
   color: var(--text);
   background: var(--bg);
@@ -22,8 +21,9 @@
 }
 
 h1,
-h2 {
-  font-family: var(--heading);
+h2,
+h3 {
+  font-family: var(--cursive);
   font-weight: 500;
   color: var(--text-h);
 }
@@ -45,6 +45,13 @@ h2 {
   @media (max-width: 1024px) {
     font-size: 20px;
   }
+}
+
+p,
+button,
+input,
+label {
+  font-family: var(--cursive);
 }
 
 @theme {
