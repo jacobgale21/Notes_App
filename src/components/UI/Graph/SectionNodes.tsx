@@ -1,5 +1,5 @@
 import { Handle, Position, type NodeProps } from "@xyflow/react";
-import type { Section } from "./graph";
+import type { Section } from "../../../data/placeholder";
 
 export function SectionNode({ data }: NodeProps) {
   const section = data as Section;

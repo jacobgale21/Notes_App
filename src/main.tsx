@@ -1,9 +1,26 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./style.css";
-import Page from "./components/page";
+import "@xyflow/react/dist/style.css";
+import NavBar from "./components/UI/navBar";
+import Page from "./components/pages/page";
+import { GraphView } from "./components/pages/graph";
+import { demoSections, demoRelations } from "./data/placeholder";
 createRoot(document.querySelector("#app")!).render(
   <StrictMode>
-    <Page />
+    <BrowserRouter>
+      <Routes>
+        <Route element={<NavBar />}>
+          <Route path="/" element={<Page />} />
+          <Route
+            path="/graph"
+            element={
+              <GraphView sections={demoSections} relations={demoRelations} />
+            }
+          />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   </StrictMode>,
 );

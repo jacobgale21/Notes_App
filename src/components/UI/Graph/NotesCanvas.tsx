@@ -7,9 +7,9 @@ import {
   useEdgesState,
 } from "@xyflow/react";
 import { SectionNode } from "./SectionNodes";
-import { toFlow } from "../lib/toFlow";
+import { toFlow } from "../../../lib/toFlow";
 
-import type { Relation, Section } from "./graph";
+import type { Relation, Section } from "../../../data/placeholder";
 const nodeTypes = { section: SectionNode };
 
 export function NotesCanvas({

@@ -1,25 +1,8 @@
 import { ReactFlowProvider } from "@xyflow/react";
 import { useState } from "react";
-import { NotesCanvas } from "./NotesCanvas";
+import { NotesCanvas } from "../UI/Graph/NotesCanvas";
 // import { Inspector } from "./Inspector";
-export type Section = {
-  id: string;
-  heading: string;
-  subsections: {
-    heading: string;
-    bullets: {
-      text: string;
-      relatedSectionIds?: string[];
-    }[];
-  }[];
-};
-export type Relation = {
-  id: string;
-  source: string; // section id
-  target: string;
-  kind: "sequence" | "related" | "contrast";
-  label?: string;
-};
+import type { Section, Relation } from "../../data/placeholder";
 
 export function GraphView({
   sections,
