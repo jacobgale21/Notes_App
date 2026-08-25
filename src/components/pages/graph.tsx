@@ -1,15 +1,9 @@
 import { ReactFlowProvider } from "@xyflow/react";
 import { useState } from "react";
 import { NotesCanvas } from "../UI/Graph/NotesCanvas";
-import type { Node, Relation } from "../../data/placeholder";
+import type { NoteGraph } from "../../data/types";
 
-export function GraphView({
-  nodes,
-  relations,
-}: {
-  nodes: Node[];
-  relations: Relation[];
-}) {
+export function GraphView({ graph }: { graph: NoteGraph }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   return (
@@ -17,8 +11,7 @@ export function GraphView({
       <div className="flex min-h-[calc(100vh-4rem)]">
         <div className="min-w-0 flex-1">
           <NotesCanvas
-            nodes={nodes}
-            relations={relations}
+            graph={graph}
             onSelect={setSelectedId}
             selectedId={selectedId}
           />

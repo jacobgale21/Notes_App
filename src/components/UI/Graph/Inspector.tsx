@@ -1,4 +1,5 @@
-import { getRelatedTopics, type Node } from "../../../data/placeholder";
+import { getRelatedTopics } from "../../../data/placeholder";
+import type { Node } from "../../../data/types";
 import { motion, AnimatePresence } from "framer-motion";
 import { BookIcon, BrainIcon, StarIcon } from "lucide-react";
 import { Button } from "../button";

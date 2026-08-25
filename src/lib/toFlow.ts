@@ -1,4 +1,4 @@
-import type { Relation, Node } from "../data/placeholder";
+import type { Relation, Node } from "../data/types";
 
 export function toFlow(nodes: Node[], relations: Relation[]) {
   const flowNodes = nodes.map((node, i) => ({

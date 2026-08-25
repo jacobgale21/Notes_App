@@ -9,7 +9,7 @@ import {
 import { NodeNode } from "./SectionNodes";
 import { toFlow } from "../../../lib/toFlow";
 import Inspector from "./Inspector";
-import type { Relation, Node, NodeKind } from "../../../data/placeholder";
+import type { NodeKind, NoteGraph } from "../../../data/types";
 
 const nodeTypes: Record<NodeKind, typeof NodeNode> = {
   root: NodeNode,
@@ -18,20 +18,21 @@ const nodeTypes: Record<NodeKind, typeof NodeNode> = {
 };
 
 export function NotesCanvas({
-  nodes,
-  relations,
+  graph,
   onSelect,
   selectedId,
 }: {
-  nodes: Node[];
-  relations: Relation[];
+  graph: NoteGraph;
   onSelect: (id: string | null) => void;
   selectedId: string | null;
 }) {
-  const { nodes: initialNodes, edges: initialEdges } = toFlow(nodes, relations);
+  const { nodes: initialNodes, edges: initialEdges } = toFlow(
+    graph.nodes,
+    graph.edges,
+  );
   const [nodesState, , onNodesChange] = useNodesState(initialNodes);
   const [edges, , onEdgesChange] = useEdgesState(initialEdges);
-  const selectedNode = nodes.find((n) => n.id === selectedId) ?? null;
+  const selectedNode = graph.nodes.find((n) => n.id === selectedId) ?? null;
   return (
     <div className="h-full w-full">
       <ReactFlow

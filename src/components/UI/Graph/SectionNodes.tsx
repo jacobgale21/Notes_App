@@ -1,5 +1,5 @@
 import { Handle, Position, type NodeProps } from "@xyflow/react";
-import type { Node } from "../../../data/placeholder";
+import type { Node } from "../../../data/types";
 
 export function NodeNode({ data }: NodeProps) {
   const node = data as Node;
