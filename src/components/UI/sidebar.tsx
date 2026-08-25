@@ -8,7 +8,7 @@ import {
   Settings,
 } from "lucide-react";
 import { Button } from "./button";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const allButtons = [
   {
@@ -43,7 +43,6 @@ const allButtons = [
   },
 ];
 export default function Sidebar() {
-  const navigate = useNavigate();
   return (
     <div className="flex flex-col h-full border-r border-black/50 p-4 gap-4">
       <header className="flex flex-row items-center mb-4">
@@ -54,24 +53,22 @@ export default function Sidebar() {
           NoteGraph
         </span>
       </header>
-      <Button asChild variant="outline" onClick={() => navigate("/upload")}>
-        <div className="flex flex-row items-start justify-start">
+      <Button asChild variant="outline">
+        <Link to="/upload" className="flex flex-row items-start justify-start">
           <Plus className="h-4 w-4" />
           <span>New Notes</span>
-        </div>
+        </Link>
       </Button>
       <div className="flex flex-col mt-4 gap-2">
         {allButtons.map((button) => (
-          <Button
-            asChild
-            variant="ghost"
-            key={button.label}
-            onClick={() => navigate(button.to)}
-          >
-            <div className="flex flex-row items-start justify-start">
+          <Button asChild variant="ghost" key={button.label}>
+            <Link
+              to={button.to}
+              className="flex flex-row items-start justify-start"
+            >
               <button.icon className="h-4 w-4" />
               <span>{button.label}</span>
-            </div>
+            </Link>
           </Button>
         ))}
       </div>
