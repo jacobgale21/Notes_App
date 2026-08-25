@@ -121,12 +121,12 @@ export default function Dashboard() {
                   className="flex flex-col items-start justify-center gap-2 bg-background rounded-lg shadow-lg w-full p-6 hover:bg-paper"
                   onClick={() => navigate(graph.to)}
                 >
-                  <h4>{graph.title}</h4>
-                  <span className="text-md text-muted-foreground rounded-full bg-paper px-2 py-1">
+                  <span className="text-sm text-muted-foreground rounded-full bg-paper py-1 px-2 mb-2">
                     {graph.subject}
                   </span>
+                  <h4>{graph.title}</h4>
                   <span className="flex flex-row items-center justify-start gap-2 text-md text-muted-foreground">
-                    {graph.concepts} concepts * {graph.links} links
+                    {graph.concepts} concepts · {graph.links} links
                   </span>
                   <span className="text-md text-muted-foreground">
                     Updated {formatUpdatedAt(graph.updatedAt)}

@@ -6,32 +6,36 @@ import {
   useNodesState,
   useEdgesState,
 } from "@xyflow/react";
-import { SectionNode } from "./SectionNodes";
+import { NodeNode } from "./SectionNodes";
 import { toFlow } from "../../../lib/toFlow";
+import Inspector from "./Inspector";
+import type { Relation, Node, NodeKind } from "../../../data/placeholder";
 
-import type { Relation, Section } from "../../../data/placeholder";
-const nodeTypes = { section: SectionNode };
+const nodeTypes: Record<NodeKind, typeof NodeNode> = {
+  root: NodeNode,
+  topic: NodeNode,
+  concept: NodeNode,
+};
 
 export function NotesCanvas({
-  sections,
+  nodes,
   relations,
   onSelect,
+  selectedId,
 }: {
-  sections: Section[];
+  nodes: Node[];
   relations: Relation[];
   onSelect: (id: string | null) => void;
+  selectedId: string | null;
 }) {
-  const { nodes: initialNodes, edges: initialEdges } = toFlow(
-    sections,
-    relations,
-  );
-  const [nodes, , onNodesChange] = useNodesState(initialNodes);
+  const { nodes: initialNodes, edges: initialEdges } = toFlow(nodes, relations);
+  const [nodesState, , onNodesChange] = useNodesState(initialNodes);
   const [edges, , onEdgesChange] = useEdgesState(initialEdges);
-
+  const selectedNode = nodes.find((n) => n.id === selectedId) ?? null;
   return (
     <div className="h-full w-full">
       <ReactFlow
-        nodes={nodes}
+        nodes={nodesState}
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
@@ -43,6 +47,9 @@ export function NotesCanvas({
         <Background />
         <Controls />
         <MiniMap />
+        <div className="flex justify-end items-center h-full">
+          {selectedNode && <Inspector node={selectedNode} />}
+        </div>
       </ReactFlow>
     </div>
   );

@@ -1,17 +1,16 @@
 import { Handle, Position, type NodeProps } from "@xyflow/react";
-import type { Section } from "../../../data/placeholder";
+import type { Node } from "../../../data/placeholder";
 
-export function SectionNode({ data }: NodeProps) {
-  const section = data as Section;
+export function NodeNode({ data }: NodeProps) {
+  const node = data as Node;
   return (
     <div className="w-64 rounded-2xl border border-line bg-card p-4 shadow-sm">
       <Handle type="target" position={Position.Top} />
-      <h2 className="text-lg">{section.heading}</h2>
-      <ul className="mt-2 text-sm text-muted">
-        {section.subsections.slice(0, 3).map((s) => (
-          <li key={s.heading}>{s.heading}</li>
-        ))}
-      </ul>
+      <h3 className="text-lg flex flex-row items-center justify-start gap-3">
+        {node.icon && <node.icon className="w-4 h-4" />}
+        {node.title}
+      </h3>
+      <p className="text-sm text-muted">{node.description}</p>
       <Handle type="source" position={Position.Bottom} />
     </div>
   );

@@ -19,7 +19,7 @@ createRoot(document.querySelector("#app")!).render(
           <Route
             path="/graph"
             element={
-              <GraphView sections={demoSections} relations={demoRelations} />
+              <GraphView nodes={demoSections} relations={demoRelations} />
             }
           />
         </Route>

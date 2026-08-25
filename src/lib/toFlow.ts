@@ -1,11 +1,11 @@
-import type { Relation, Section } from "../data/placeholder";
+import type { Relation, Node } from "../data/placeholder";
 
-export function toFlow(sections: Section[], relations: Relation[]) {
-  const nodes = sections.map((section, i) => ({
-    id: section.id,
-    type: "section", // must match nodeTypes key
+export function toFlow(nodes: Node[], relations: Relation[]) {
+  const flowNodes = nodes.map((node, i) => ({
+    id: node.id,
+    type: node.type, // must match nodeTypes key
     position: { x: 0, y: i * 180 }, // later: dagre layout
-    data: section, // passed into SectionNode as data
+    data: node, // passed into SectionNode as data
   }));
   //   const subsectionNodes = subsections.map((subsection, i) => ({
   //     id: subsection.id,
@@ -17,7 +17,7 @@ export function toFlow(sections: Section[], relations: Relation[]) {
     id: r.id,
     source: r.source,
     target: r.target,
-    label: r.label ?? r.kind,
+    relationship: r.relationship,
   }));
-  return { nodes, edges };
+  return { nodes: flowNodes, edges };
 }
