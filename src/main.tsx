@@ -8,6 +8,7 @@ import Page from "./components/pages/page";
 import { GraphView } from "./components/pages/graph";
 import { demoSections, demoRelations } from "./data/placeholder";
 import Home from "./components/pages/home";
+import Dashboard from "./components/pages/dashboard";
 createRoot(document.querySelector("#app")!).render(
   <StrictMode>
     <BrowserRouter>
@@ -22,6 +23,7 @@ createRoot(document.querySelector("#app")!).render(
             }
           />
         </Route>
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,

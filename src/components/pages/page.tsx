@@ -2,6 +2,7 @@ import { useState } from "react";
 import { getNotes } from "../../api";
 import { UploadCloud, FileText } from "lucide-react";
 import "@xyflow/react/dist/style.css";
+import { Button } from "../UI/button";
 
 export default function Page() {
   const [notes, setNotes] = useState<File | null>(null);
@@ -45,7 +46,7 @@ export default function Page() {
           Drop in your lecture notes and we'll turn the fragments into a map you
           can actually study from.
         </p>
-        <div className="mb-5 flex gap-1 rounded-xl border border-black bg-white/[.025] p-1 sm:w-fit">
+        <div className="mb-5 flex gap-1 rounded-xl border border-black/70 bg-white/[.025] p-1 sm:w-fit">
           <button
             onClick={() => setSelectedTab("upload")}
             className={`rounded-lg p-2 text-xs font-semibold transition ${selectedTab === "upload" ? "bg-white/[.1] text-slate-500 border-2" : "text-slate-500 hover:text-slate-300"}`}
@@ -79,7 +80,7 @@ export default function Page() {
         ) : (
           <>
             <textarea
-              className="border-2 border-black/70 rounded-md shadow-md p-2 bg-white w-full max-w-lg mx-auto h-40"
+              className="border-2 border-black/50 rounded-md shadow-md p-2 bg-white w-full max-w-lg mx-auto h-40"
               placeholder="Drop text here or click to paste"
             />
           </>
@@ -89,12 +90,14 @@ export default function Page() {
         {notes && (
           <p className="mt-4 text-success">Selected file: {notes.name}</p>
         )}
-        <button
-          className="mt-4 border-2 border-black/70 text-black px-4 py-2 rounded-md"
+        <Button
+          asChild
+          variant="brand"
+          className="mt-4 w-full max-w-lg"
           onClick={handleGetNotes}
         >
-          Upload Notes
-        </button>
+          Generate Knowledge Graph
+        </Button>
       </main>
     </div>
   );

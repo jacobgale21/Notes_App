@@ -18,6 +18,9 @@ export default function NavBar() {
             <Button asChild variant="ghost" size="sm">
               <Link to="/">Home</Link>
             </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/dashboard">Dashboard</Link>
+            </Button>
             <Button asChild variant="brand" size="sm">
               <Link to="/upload">Upload</Link>
             </Button>

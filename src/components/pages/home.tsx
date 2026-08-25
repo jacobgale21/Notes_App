@@ -95,7 +95,7 @@ export default function Home() {
             className="mt-8 flex flex-wrap items-center justify-center gap-3"
           >
             <Button asChild variant="brand" size="lg" className="glow-ring">
-              <Link to="/app/upload">
+              <Link to="/upload">
                 <Upload className="mr-2 h-4 w-4" /> Upload your notes
               </Link>
             </Button>
