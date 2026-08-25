@@ -137,7 +137,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-5 py-10">
+      <section className="mx-auto max-w-6xl px-5">
         <h2 className="text-center text-3xl font-bold tracking-tight">
           How it works
         </h2>
@@ -162,7 +162,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-5 pb-20">
+      <section className="mx-auto max-w-6xl px-5 pb-10">
         <div className="grid gap-4 sm:grid-cols-3">
           {features.map((f) => (
             <div
@@ -181,7 +181,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-4xl px-5 pb-24">
+      <section className="mx-auto max-w-4xl px-5 pb-10">
         <div className="relative overflow-hidden rounded-3xl border border-border bg-card p-10 text-center">
           <div className="pointer-events-none absolute inset-0 halo opacity-60" />
           <div className="relative">
@@ -192,7 +192,7 @@ export default function Home() {
               No account needed for the demo — jump straight into a real graph.
             </p>
             <Button asChild variant="brand" size="lg" className="mt-7">
-              <Link to="/app">
+              <Link to="/dashboard">
                 Open NoteGraph <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>

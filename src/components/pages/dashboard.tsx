@@ -1,10 +1,78 @@
 import Sidebar from "../UI/sidebar";
 import { Button } from "../UI/button";
-import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { ArrowRight, BookOpen, Brain, Network, Notebook } from "lucide-react";
 import Header from "../UI/header";
 
+// Placeholder data for the dashboard: will fetch from the user database when developed
+const placehoderData = [
+  {
+    title: "Knowledge Graphs",
+    value: 5,
+    icon: Network,
+  },
+  {
+    title: "Concepts Mapped",
+    value: 40,
+    icon: Brain,
+  },
+  {
+    title: "Notes Processed",
+    value: 4,
+    icon: Notebook,
+  },
+  {
+    title: "Day Study Streak",
+    value: 3,
+    icon: BookOpen,
+  },
+];
+
+// Placeholder data for the recent graphs: will fetch from the user database when developed
+const recentGraphs = [
+  {
+    title: "Computer Architecture",
+    subject: "Computer Science",
+    concepts: 19,
+    links: 12,
+    updatedAt: "2026-08-25",
+    to: "/app/graph/1",
+  },
+  {
+    title: "Operating Systems",
+    subject: "Computer Science",
+    concepts: 12,
+    links: 8,
+    updatedAt: "2026-08-24",
+    to: "/app/graph/2",
+  },
+  {
+    title: "Database Systems",
+    subject: "Computer Science",
+    concepts: 15,
+    links: 10,
+    updatedAt: "2026-08-23",
+    to: "/app/graph/3",
+  },
+];
+
+function formatUpdatedAt(isoDate: string): string {
+  const [year, month, day] = isoDate.split("-").map(Number);
+  const then = new Date(year, month - 1, day);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const diffDays = Math.round(
+    (today.getTime() - then.getTime()) / (1000 * 60 * 60 * 24),
+  );
+
+  if (diffDays <= 0) return "today";
+  if (diffDays === 1) return "yesterday";
+  return `${diffDays} days ago`;
+}
+
 export default function Dashboard() {
+  const navigate = useNavigate();
   return (
     <div className="flex flex-row h-screen">
       <div className="w-1/6 h-full">
@@ -30,6 +98,43 @@ export default function Dashboard() {
               </Button>
             </div>
           </header>
+          <section className="mt-6 flex flex-row justify-between gap-2 w-full">
+            {placehoderData.map((item) => (
+              <div
+                key={item.title}
+                className="flex flex-col items-start justify-center gap-2 bg-background rounded-lg shadow-lg w-full p-6"
+              >
+                <item.icon className="h-6 w-6" />
+                <h3>{item.value}</h3>
+                <span className="text-md text-muted-foreground">
+                  {item.title}
+                </span>
+              </div>
+            ))}
+          </section>
+          <section className="mt-6 w-full">
+            <h2>Your Graphs</h2>
+            <div className="mt-4 flex flex-row justify-between gap-2 w-full">
+              {recentGraphs.map((graph) => (
+                <button
+                  key={graph.title}
+                  className="flex flex-col items-start justify-center gap-2 bg-background rounded-lg shadow-lg w-full p-6 hover:bg-paper"
+                  onClick={() => navigate(graph.to)}
+                >
+                  <h4>{graph.title}</h4>
+                  <span className="text-md text-muted-foreground rounded-full bg-paper px-2 py-1">
+                    {graph.subject}
+                  </span>
+                  <span className="flex flex-row items-center justify-start gap-2 text-md text-muted-foreground">
+                    {graph.concepts} concepts * {graph.links} links
+                  </span>
+                  <span className="text-md text-muted-foreground">
+                    Updated {formatUpdatedAt(graph.updatedAt)}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </section>
         </div>
       </div>
     </div>
