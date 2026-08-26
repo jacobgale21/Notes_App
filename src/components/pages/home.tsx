@@ -10,7 +10,9 @@ import {
 import { Button } from "../UI/button";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-
+import { refresh } from "../../api";
+import { setAccessToken } from "../../auth";
+import { useEffect } from "react";
 const steps = [
   {
     icon: Upload,

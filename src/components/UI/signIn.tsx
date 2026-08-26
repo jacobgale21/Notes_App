@@ -10,24 +10,19 @@ export default function SignIn({ type }: { type: "login" | "signup" }) {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const handleLogin = async () => {
-    const response = await login({ email, password });
-    if (response.status === 200) {
+    try {
+      await login({ email, password });
       navigate("/dashboard");
-    } else {
-      setError(response.data.message);
+    } catch {
+      setError("Error invalid credentials");
     }
-    console.log(response);
   };
   const handleSignup = async () => {
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-    const response = await signup({ email, password });
-    if (response.status === 200) {
+    try {
+      await signup({ email, password });
       navigate("/login");
-    } else {
-      setError(response.data);
+    } catch {
+      setError("Error invalid credentials");
     }
   };
   return (
