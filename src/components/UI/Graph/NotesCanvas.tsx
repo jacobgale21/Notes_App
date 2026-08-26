@@ -67,11 +67,17 @@ export function NotesCanvas({
           fitView
           className="h-full w-full"
         >
-          <Panel position="top-left" className="nodrag nopan w-80">
-            <GraphSearch graph={graph} onPick={focusNode} />
+          <Panel position="top-left" className="nopan flex items-center gap-2">
+            <Controls
+              className="!relative !m-0 !top-auto !left-auto"
+              orientation="horizontal"
+            />
+            <div className="nodrag w-80">
+              <GraphSearch graph={graph} onPick={focusNode} />
+            </div>
           </Panel>
           <Background />
-          <Controls />
+
           <MiniMap position="bottom-left" />
         </ReactFlow>
       </div>

@@ -9,6 +9,8 @@ import { GraphView } from "./components/pages/graph";
 import { computerArchitecture } from "./data/placeholder";
 import Home from "./components/pages/home";
 import Dashboard from "./components/pages/dashboard";
+import Signup from "./components/pages/signup";
+import Login from "./components/pages/login";
 createRoot(document.querySelector("#app")!).render(
   <StrictMode>
     <BrowserRouter>
@@ -16,6 +18,8 @@ createRoot(document.querySelector("#app")!).render(
         <Route element={<NavBar />}>
           <Route path="/" element={<Home />} />
           <Route path="/upload" element={<Page />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
           <Route
             path="/graph"
             element={<GraphView graph={computerArchitecture} />}
