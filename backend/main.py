@@ -2,6 +2,10 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from routes.userRouter import router as userRouter
+from dotenv import load_dotenv
+from sqlalchemy import text
+from db import engine
+load_dotenv()
 # Define your frontend URL (or use ["*"] to allow all origins temporarily)
 origins = ["http://localhost:5173"] 
 
