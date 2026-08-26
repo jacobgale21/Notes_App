@@ -5,6 +5,7 @@ import {
   MiniMap,
   useNodesState,
   useEdgesState,
+  Panel,
 } from "@xyflow/react";
 import { useMemo } from "react";
 import { NodeNode } from "./SectionNodes";
@@ -12,6 +13,8 @@ import { toFlow } from "../../../lib/toFlow";
 import { layoutGraph } from "../../../lib/layout";
 import type { NodeKind, NoteGraph } from "../../../data/types";
 import Inspector from "./Inspector";
+import { useReactFlow } from "@xyflow/react";
+import GraphSearch from "./GraphSearch";
 
 const nodeTypes: Record<NodeKind, typeof NodeNode> = {
   root: NodeNode,
@@ -28,6 +31,8 @@ export function NotesCanvas({
   onSelect: (id: string | null) => void;
   selectedId: string | null;
 }) {
+  const { fitView } = useReactFlow();
+
   const layout = useMemo(() => layoutGraph(graph), [graph]);
   const { nodes: initialNodes, edges: initialEdges } = useMemo(
     () => toFlow(graph, layout),
@@ -37,6 +42,17 @@ export function NotesCanvas({
   const [edges, , onEdgesChange] = useEdgesState(initialEdges);
   const selectedNode = graph.nodes.find((n) => n.id === selectedId) ?? null;
 
+  function focusNode(id: string) {
+    onSelect(id);
+    window.requestAnimationFrame(() => {
+      fitView({
+        nodes: [{ id }],
+        padding: 0.5,
+        duration: 400,
+        maxZoom: 1.25,
+      });
+    });
+  }
   return (
     <div className="flex h-full min-h-0 w-full">
       <div className="relative min-h-0 min-w-0 flex-1">
@@ -51,12 +67,15 @@ export function NotesCanvas({
           fitView
           className="h-full w-full"
         >
+          <Panel position="top-left" className="nodrag nopan w-80">
+            <GraphSearch graph={graph} onPick={focusNode} />
+          </Panel>
           <Background />
           <Controls />
-          <MiniMap />
+          <MiniMap position="bottom-left" />
         </ReactFlow>
       </div>
-      {selectedNode && <Inspector node={selectedNode} />}
+      {selectedNode && <Inspector node={selectedNode} focusNode={focusNode} />}
     </div>
   );
 }

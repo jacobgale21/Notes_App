@@ -18,7 +18,13 @@ const studyOptions = [
   },
 ];
 
-export default function Inspector({ node }: { node: Node }) {
+export default function Inspector({
+  node,
+  focusNode,
+}: {
+  node: Node;
+  focusNode: (id: string) => void;
+}) {
   const relatedTopics = getRelatedTopics(node);
   return (
     <AnimatePresence>
@@ -57,7 +63,11 @@ export default function Inspector({ node }: { node: Node }) {
           {relatedTopics.length
             ? relatedTopics.map((topic) => {
                 return (
-                  <span className="text-sm text-muted shadow-sm rounded-md px-2 py-1 bg-paper">
+                  <span
+                    key={topic}
+                    className="text-sm text-muted shadow-sm rounded-md px-2 py-1 bg-paper cursor-pointer"
+                    onClick={() => focusNode(topic)}
+                  >
                     {topic}
                   </span>
                 );
