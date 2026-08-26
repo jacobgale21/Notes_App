@@ -189,11 +189,11 @@ export default function Home() {
               Study smarter tonight
             </h2>
             <p className="mx-auto mt-3 max-w-md text-muted-foreground">
-              No account needed for the demo — jump straight into a real graph.
+              Sign up for NoteGraph to start creating your own study graphs.
             </p>
             <Button asChild variant="brand" size="lg" className="mt-7">
-              <Link to="/dashboard">
-                Open NoteGraph <ArrowRight className="ml-2 h-4 w-4" />
+              <Link to="/signup">
+                Sign up for NoteGraph <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
           </div>

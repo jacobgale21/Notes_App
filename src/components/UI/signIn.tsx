@@ -1,18 +1,37 @@
 import { useState } from "react";
 import { Button } from "./button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { login, signup } from "../../api";
+
 export default function SignIn({ type }: { type: "login" | "signup" }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const handleLogin = () => {
-    console.log(email, password);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const handleLogin = async () => {
+    const response = await login({ email, password });
+    if (response.status === 200) {
+      navigate("/dashboard");
+    } else {
+      setError(response.data.message);
+    }
+    console.log(response);
   };
-  const handleSignup = () => {
-    console.log(email, password);
+  const handleSignup = async () => {
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+    const response = await signup({ email, password });
+    if (response.status === 200) {
+      navigate("/login");
+    } else {
+      setError(response.data);
+    }
   };
   return (
-    <div className="flex flex-col items-center justify-center h-screen gap-2 w-1/4 mx-auto p-4">
+    <div className="flex flex-col items-center justify-center h-screen gap-3 sm:w-1/2 md:w-1/3 mx-auto p-4">
       <h1 className="text-2xl font-bold">
         {type === "login" ? "Login" : "Signup"}
       </h1>
@@ -44,6 +63,7 @@ export default function SignIn({ type }: { type: "login" | "signup" }) {
           />
         </>
       )}
+      {error && <p className="text-red-500">{error}</p>}
       {type === "login" ? (
         <Button
           variant="outline"

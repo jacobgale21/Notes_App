@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-
+from routes.userRouter import router as userRouter
 # Define your frontend URL (or use ["*"] to allow all origins temporarily)
-origins = ["http://localhost:5174"] 
+origins = ["http://localhost:5173"] 
 
 
 # Initialize the FastAPI app instance
@@ -16,6 +16,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(userRouter)
 
 # 1. Simple GET Endpoint (Health Check / Welcome)
 @app.get("/")

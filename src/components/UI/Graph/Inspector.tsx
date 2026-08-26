@@ -78,11 +78,11 @@ export default function Inspector({
         {studyOptions.map((option) => (
           <div
             key={option.title}
-            className="flex flex-row items-center justify-start gap-2 px-5 my-1 rounded-md hover:bg-paper cursor-pointer"
+            className="flex flex-row items-center justify-start gap-2 px-5 my-1 rounded-md  cursor-pointer"
           >
             <Button
               variant="outline"
-              className="text-sm text-muted flex flex-row items-center justify-start gap-2 w-full py-2"
+              className="text-sm text-muted flex flex-row items-center justify-start gap-2 w-full py-2 hover:bg-paper"
             >
               <option.icon className="w-4 h-4" />
               <span>{option.title}</span>
