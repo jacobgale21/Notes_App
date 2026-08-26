@@ -5,11 +5,10 @@ import type { NoteGraph } from "../../data/types";
 
 export function GraphView({ graph }: { graph: NoteGraph }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
-
   return (
     <ReactFlowProvider>
-      <div className="flex min-h-[calc(100vh-4rem)]">
-        <div className="min-w-0 flex-1">
+      <div className="flex h-[calc(100vh-4rem)] min-h-0">
+        <div className="min-h-0 min-w-0 flex-1">
           <NotesCanvas
             graph={graph}
             onSelect={setSelectedId}

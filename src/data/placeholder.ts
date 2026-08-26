@@ -260,8 +260,7 @@ export const computerArchitecture: NoteGraph = {
 
 export function getRelatedTopics(node: Node): string[] {
   const relatedTo = new Map<string, Set<string>>();
-  for (const r of demoRelations) {
-    if (r.relationship !== "related") continue;
+  for (const r of computerArchitecture.edges) {
     if (!relatedTo.has(r.source)) relatedTo.set(r.source, new Set());
     if (!relatedTo.has(r.target)) relatedTo.set(r.target, new Set());
     relatedTo.get(r.source)!.add(r.target);

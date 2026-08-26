@@ -54,11 +54,15 @@ export default function Inspector({ node }: { node: Node }) {
           Related Topics
         </h4>
         <div className="flex flex-row items-center justify-start gap-2 px-5">
-          <span className="text-sm text-muted shadow-sm rounded-md px-2 py-1 bg-paper">
-            {relatedTopics.length
-              ? relatedTopics.map((topic) => <span key={topic}>{topic}</span>)
-              : "No related topics"}
-          </span>
+          {relatedTopics.length
+            ? relatedTopics.map((topic) => {
+                return (
+                  <span className="text-sm text-muted shadow-sm rounded-md px-2 py-1 bg-paper">
+                    {topic}
+                  </span>
+                );
+              })
+            : "No related topics"}
         </div>
         <h4 className="text-md font-medium text-muted px-5 pt-4">Study</h4>
         {studyOptions.map((option) => (

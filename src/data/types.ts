@@ -25,6 +25,6 @@ export type NoteGraph = {
   title: string;
   subject: string;
   updatedAt: string;
-  nodes: NoteNode[];
-  edges: NoteEdge[];
+  nodes: Node[];
+  edges: Relation[];
 };
