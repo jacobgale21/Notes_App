@@ -101,3 +101,19 @@ label {
 .float-soft {
   animation: float-soft 3s ease-in-out infinite;
 }
+
+.tiptap {
+  min-height: 10rem;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+.tiptap * {
+  max-width: 100%;
+}
+.tiptap p.is-editor-empty:first-child::before {
+  color: var(--color-muted, #78716c);
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}

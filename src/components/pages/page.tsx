@@ -3,6 +3,11 @@ import { getNotes } from "../../api";
 import { UploadCloud, FileText } from "lucide-react";
 import "@xyflow/react/dist/style.css";
 import { Button } from "../UI/button";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import { TextStyle } from "@tiptap/extension-text-style";
+import { FontFamily } from "@tiptap/extension-font-family";
+import Placeholder from "@tiptap/extension-placeholder";
 
 export default function Page() {
   const [notes, setNotes] = useState<File | null>(null);
@@ -35,6 +40,23 @@ export default function Page() {
     const response = await getNotes();
     console.log(response);
   };
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Placeholder.configure({
+        placeholder: "Drop text here or click to paste",
+      }),
+      TextStyle,
+      FontFamily,
+    ],
+    content: "<p></p>",
+    editorProps: {
+      attributes: {
+        class:
+          "border-2 border-black/50 rounded-md shadow-md p-2 bg-white min-h-40 w-full overflow-x-hidden break-words whitespace-pre-wrap outline-none",
+      },
+    },
+  });
 
   return (
     <div className="flex min-h-screen flex-col bg-paper text-ink">
@@ -79,10 +101,9 @@ export default function Page() {
           </>
         ) : (
           <>
-            <textarea
-              className="border-2 border-black/50 rounded-md shadow-md p-2 bg-white w-full max-w-lg mx-auto h-40"
-              placeholder="Drop text here or click to paste"
-            />
+            <div className="w-full max-w-lg min-w-0">
+              <EditorContent editor={editor} />
+            </div>
           </>
         )}
 

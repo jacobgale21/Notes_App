@@ -5,11 +5,12 @@ import { ArrowRight, BookOpen, Brain, Network, Notebook } from "lucide-react";
 import Header from "../UI/header";
 import { useGetGraphs } from "../../hooks/useCatalog";
 import type { GraphSummary } from "../../data/types";
+import { useState } from "react";
 // Placeholder data for the dashboard: will fetch from the user database when developed
-const placehoderData = [
+const placeholderData = [
   {
     title: "Knowledge Graphs",
-    value: 5,
+    value: 0,
     icon: Network,
   },
   {
@@ -49,6 +50,8 @@ function formatUpdatedAt(isoDate: string): string {
 
 export default function Dashboard() {
   const { data: graphs } = useGetGraphs();
+  const [numberOfGraphs, setNumberOfGraphs] = useState(graphs?.length ?? 0);
+
   const navigate = useNavigate();
   return (
     <div className="flex flex-row h-screen">
@@ -76,18 +79,31 @@ export default function Dashboard() {
             </div>
           </header>
           <section className="mt-6 flex flex-row justify-between gap-2 w-full">
-            {placehoderData.map((item) => (
-              <div
-                key={item.title}
-                className="flex flex-col items-start justify-center gap-2 bg-background rounded-lg shadow-lg w-full p-6"
-              >
-                <item.icon className="h-6 w-6" />
-                <h3>{item.value}</h3>
-                <span className="text-md text-muted-foreground">
-                  {item.title}
-                </span>
-              </div>
-            ))}
+            {placeholderData.map((item, index) =>
+              index === 0 ? (
+                <div
+                  key={item.title}
+                  className="flex flex-col items-start justify-center gap-2 bg-background rounded-lg shadow-lg w-full p-6"
+                >
+                  <item.icon className="h-6 w-6" />
+                  <h3>{numberOfGraphs}</h3>
+                  <span className="text-md text-muted-foreground">
+                    {item.title}
+                  </span>
+                </div>
+              ) : (
+                <div
+                  key={item.title}
+                  className="flex flex-col items-start justify-center gap-2 bg-background rounded-lg shadow-lg w-full p-6"
+                >
+                  <item.icon className="h-6 w-6" />
+                  <h3>{item.value}</h3>
+                  <span className="text-md text-muted-foreground">
+                    {item.title}
+                  </span>
+                </div>
+              ),
+            )}
           </section>
           <section className="mt-6 w-full">
             <h2>Your Graphs</h2>
