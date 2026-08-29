@@ -1,9 +1,9 @@
-import type { NoteGraph, Node } from "../../../data/types";
+import type { Graph, Node } from "../../../data/types";
 import { useState } from "react";
 
 function matches(node: Node, q: string) {
   const hay =
-    `${node.title} ${node.description} ${node.content.join(" ")}`.toLowerCase();
+    `${node.title} ${node.description} ${node.content.map((c) => c.text).join(" ")}`.toLowerCase();
   return hay.includes(q);
 }
 
@@ -11,7 +11,7 @@ export default function GraphSearch({
   graph,
   onPick,
 }: {
-  graph: NoteGraph;
+  graph: Graph;
   onPick: (id: string) => void;
 }) {
   const [query, setQuery] = useState("");

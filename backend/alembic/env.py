@@ -7,6 +7,10 @@ from alembic import context
 import os
 from dotenv import load_dotenv
 from models.userModel import User
+from models.graphModel import GraphModel
+from models.nodeModel import NodeModel
+from models.edgeModel import EdgeModel
+from db import Base
 load_dotenv()  # loads backend/.env when you run alembic from backend/
 
 
@@ -25,7 +29,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = User.metadata
+target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

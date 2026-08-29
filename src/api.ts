@@ -1,5 +1,6 @@
 import axios from "axios";
 import { getAccessToken, setAccessToken } from "./auth";
+import type { Graph } from "./data/types";
 export const api = axios.create({
   baseURL: "http://localhost:8000",
   withCredentials: true, // send HttpOnly cookie on /user/refresh
@@ -15,12 +16,24 @@ api.interceptors.response.use(
   (res) => res,
   async (error) => {
     const original = error.config;
-    if (error.response?.status !== 401 || original._retry) throw error;
+    const url = String(original?.url ?? "");
+    const isAuthRoute =
+      url.includes("/user/refresh") ||
+      url.includes("/user/login") ||
+      url.includes("/user/signup");
+    if (error.response?.status !== 401 || original._retry || isAuthRoute) {
+      throw error;
+    }
     original._retry = true;
-    const { data } = await api.post("/user/refresh"); // cookie goes automatically
-    setAccessToken(data.access_token);
-    original.headers.Authorization = `Bearer ${data.access_token}`;
-    return api.request(original);
+    try {
+      const { data } = await api.post("/user/refresh");
+      setAccessToken(data.access_token);
+      original.headers.Authorization = `Bearer ${data.access_token}`;
+      return api.request(original);
+    } catch (refreshError) {
+      setAccessToken(null);
+      throw refreshError;
+    }
   },
 );
 
@@ -47,4 +60,14 @@ export const login = async (user: User) => {
 export const refresh = async () => {
   const { data } = await api.post("/user/refresh");
   setAccessToken(data.access_token);
+};
+
+export const createGraph = async (): Promise<Graph> => {
+  const { data } = await api.post<Graph>("/graph");
+  return data;
+};
+
+export const getGraph = async (id: string) => {
+  const { data } = await api.get(`/graph/${id}`);
+  return data;
 };

@@ -6,7 +6,6 @@ import "@xyflow/react/dist/style.css";
 import NavBar from "./components/UI/navBar";
 import Page from "./components/pages/page";
 import { GraphView } from "./components/pages/graph";
-import { computerArchitecture } from "./data/placeholder";
 import Home from "./components/pages/home";
 import Dashboard from "./components/pages/dashboard";
 import Signup from "./components/pages/signup";
@@ -28,10 +27,7 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/upload" element={<Page />} />
-          <Route
-            path="/graph"
-            element={<GraphView graph={computerArchitecture} />}
-          />
+          <Route path="/graph" element={<GraphView />} />
         </Route>
       </Route>
       <Route element={<ProtectedRoute />}>

@@ -1,4 +1,4 @@
-import type { NoteGraph } from "../data/types";
+import type { Graph } from "../data/types";
 
 export type Positioned = Record<string, { x: number; y: number }>;
 
@@ -9,12 +9,12 @@ const ROW_HEIGHT = 130;
  * Simple deterministic hierarchical (left-to-right tree) layout.
  * Kept separate from UI so a real layout engine can replace it later.
  */
-export function layoutGraph(graph: NoteGraph): Positioned {
+export function layoutGraph(graph: Graph): Positioned {
   const children = new Map<string, string[]>();
   const hasParent = new Set<string>();
 
   for (const edge of graph.edges) {
-    if (edge.relationship !== "contains") continue;
+    if (edge.rel_type !== "contains") continue;
     const list = children.get(edge.source) ?? [];
     if (!list.includes(edge.target)) list.push(edge.target);
     children.set(edge.source, list);
@@ -37,9 +37,7 @@ export function layoutGraph(graph: NoteGraph): Positioned {
       y = cursor * ROW_HEIGHT;
       cursor += 1;
     } else {
-      const ys = kids
-        .map((k) => place(k, depth + 1))
-        .filter(Number.isFinite);
+      const ys = kids.map((k) => place(k, depth + 1)).filter(Number.isFinite);
       y =
         ys.length > 0
           ? (Math.min(...ys) + Math.max(...ys)) / 2

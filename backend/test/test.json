@@ -1,0 +1,479 @@
+{
+  "title": "Computer Architecture",
+  "subject": "Computer Science",
+  "nodes": [
+    {
+      "id": "root",
+      "title": "Computer Architecture",
+      "subtitle": "Course overview",
+      "description": "The organization and design of computer systems.",
+      "type": "root",
+      "content": [
+        {
+          "id": "root-1",
+          "type": "text",
+          "text": "Describes how hardware components are organized"
+        },
+        {
+          "id": "root-2",
+          "type": "text",
+          "text": "Defines the interface between hardware and software"
+        },
+        {
+          "id": "root-3",
+          "type": "text",
+          "text": "Drives performance, cost and power trade-offs"
+        }
+      ]
+    },
+    {
+      "id": "cpu",
+      "title": "CPU",
+      "subtitle": "Central Processing Unit",
+      "description": "Central processing unit responsible for executing instructions.",
+      "type": "topic",
+      "content": [
+        {
+          "id": "cpu-1",
+          "type": "text",
+          "text": "Executes program instructions"
+        },
+        {
+          "id": "cpu-2",
+          "type": "text",
+          "text": "Performs arithmetic and logical operations"
+        },
+        {
+          "id": "cpu-3",
+          "type": "text",
+          "text": "Controls system operations"
+        },
+        {
+          "id": "cpu-4",
+          "type": "text",
+          "text": "Uses registers for extremely fast temporary storage"
+        }
+      ]
+    },
+    {
+      "id": "memory",
+      "title": "Memory",
+      "description": "Stores instructions and data for active programs.",
+      "type": "topic",
+      "content": [
+        {
+          "id": "memory-1",
+          "type": "text",
+          "text": "Organized as a hierarchy by speed and cost"
+        },
+        {
+          "id": "memory-2",
+          "type": "text",
+          "text": "Volatile memory loses contents on power off"
+        },
+        {
+          "id": "memory-3",
+          "type": "text",
+          "text": "Locality of reference makes caching effective"
+        }
+      ]
+    },
+    {
+      "id": "io",
+      "title": "Input / Output",
+      "description": "Moves data between the computer and the outside world.",
+      "type": "topic",
+      "content": [
+        {
+          "id": "io-1",
+          "type": "text",
+          "text": "Uses controllers and buses to talk to devices"
+        },
+        {
+          "id": "io-2",
+          "type": "text",
+          "text": "Polling, interrupts and DMA are transfer strategies"
+        },
+        {
+          "id": "io-3",
+          "type": "text",
+          "text": "I/O is usually far slower than CPU and memory"
+        }
+      ]
+    },
+    {
+      "id": "storage",
+      "title": "Storage",
+      "description": "Non-volatile long-term data retention.",
+      "type": "topic",
+      "content": [
+        {
+          "id": "storage-1",
+          "type": "text",
+          "text": "SSDs use flash cells; HDDs use spinning platters"
+        },
+        {
+          "id": "storage-2",
+          "type": "text",
+          "text": "Persists data across power cycles"
+        },
+        {
+          "id": "storage-3",
+          "type": "text",
+          "text": "Backs virtual memory paging"
+        }
+      ]
+    },
+    {
+      "id": "performance",
+      "title": "Performance",
+      "description": "How fast a system executes a given workload.",
+      "type": "topic",
+      "content": [
+        {
+          "id": "performance-1",
+          "type": "text",
+          "text": "CPU time = Instruction Count x CPI x Clock Cycle Time"
+        },
+        {
+          "id": "performance-2",
+          "type": "text",
+          "text": "Amdahl's law limits speedup from partial optimization"
+        },
+        {
+          "id": "performance-3",
+          "type": "text",
+          "text": "Benchmarks compare real workloads, not peak numbers"
+        }
+      ]
+    },
+    {
+      "id": "alu",
+      "title": "ALU",
+      "subtitle": "Arithmetic Logic Unit",
+      "description": "Performs arithmetic and logical operations on data.",
+      "type": "concept",
+      "content": [
+        {
+          "id": "alu-1",
+          "type": "text",
+          "text": "Handles add, subtract, AND, OR, XOR, shifts"
+        },
+        {
+          "id": "alu-2",
+          "type": "text",
+          "text": "Sets status flags such as zero and carry"
+        },
+        {
+          "id": "alu-3",
+          "type": "text",
+          "text": "Operands usually come from registers"
+        }
+      ]
+    },
+    {
+      "id": "control-unit",
+      "title": "Control Unit",
+      "description": "Decodes instructions and directs the other components.",
+      "type": "concept",
+      "content": [
+        {
+          "id": "control-unit-1",
+          "type": "text",
+          "text": "Generates control signals each cycle"
+        },
+        {
+          "id": "control-unit-2",
+          "type": "text",
+          "text": "Can be hardwired or microprogrammed"
+        },
+        {
+          "id": "control-unit-3",
+          "type": "text",
+          "text": "Sequences the instruction cycle"
+        }
+      ]
+    },
+    {
+      "id": "registers",
+      "title": "Registers",
+      "description": "Tiny, extremely fast storage inside the CPU.",
+      "type": "concept",
+      "content": [
+        {
+          "id": "registers-1",
+          "type": "text",
+          "text": "Fastest level of the memory hierarchy"
+        },
+        {
+          "id": "registers-2",
+          "type": "text",
+          "text": "Includes PC, instruction register and general purpose registers"
+        },
+        {
+          "id": "registers-3",
+          "type": "text",
+          "text": "Register count affects compiler code quality"
+        }
+      ]
+    },
+    {
+      "id": "instruction-cycle",
+      "title": "Instruction Cycle",
+      "description": "Fetch, decode, execute, write-back loop.",
+      "type": "concept",
+      "content": [
+        {
+          "id": "instruction-cycle-1",
+          "type": "text",
+          "text": "Fetch the instruction at the program counter"
+        },
+        {
+          "id": "instruction-cycle-2",
+          "type": "text",
+          "text": "Decode it into control signals"
+        },
+        {
+          "id": "instruction-cycle-3",
+          "type": "text",
+          "text": "Execute and write results back"
+        },
+        {
+          "id": "instruction-cycle-4",
+          "type": "text",
+          "text": "Pipelining overlaps these stages"
+        }
+      ]
+    },
+    {
+      "id": "cache",
+      "title": "Cache",
+      "description": "Small fast memory holding recently used data.",
+      "type": "concept",
+      "content": [
+        {
+          "id": "cache-1",
+          "type": "text",
+          "text": "Exploits temporal and spatial locality"
+        },
+        {
+          "id": "cache-2",
+          "type": "text",
+          "text": "Hit rate dominates effective access time"
+        },
+        {
+          "id": "cache-3",
+          "type": "text",
+          "text": "Organized into lines and sets"
+        }
+      ]
+    },
+    {
+      "id": "ram",
+      "title": "RAM",
+      "description": "Volatile main memory used by running programs.",
+      "type": "concept",
+      "content": [
+        {
+          "id": "ram-1",
+          "type": "text",
+          "text": "DRAM must be refreshed periodically"
+        },
+        {
+          "id": "ram-2",
+          "type": "text",
+          "text": "Accessed by physical address after translation"
+        },
+        {
+          "id": "ram-3",
+          "type": "text",
+          "text": "Much slower than cache, much faster than storage"
+        }
+      ]
+    },
+    {
+      "id": "memory-hierarchy",
+      "title": "Memory Hierarchy",
+      "description": "Layers trading capacity against speed.",
+      "type": "concept",
+      "content": [
+        {
+          "id": "memory-hierarchy-1",
+          "type": "text",
+          "text": "Registers → Cache → RAM → Storage"
+        },
+        {
+          "id": "memory-hierarchy-2",
+          "type": "text",
+          "text": "Each level is larger, slower and cheaper per byte"
+        },
+        {
+          "id": "memory-hierarchy-3",
+          "type": "text",
+          "text": "Gives the illusion of large fast memory"
+        }
+      ]
+    },
+    {
+      "id": "l1",
+      "title": "L1 Cache",
+      "description": "Smallest and fastest cache, closest to the core.",
+      "type": "concept",
+      "content": [
+        {
+          "id": "l1-1",
+          "type": "text",
+          "text": "Typically 32–64 KB per core"
+        },
+        {
+          "id": "l1-2",
+          "type": "text",
+          "text": "Often split into instruction and data caches"
+        },
+        {
+          "id": "l1-3",
+          "type": "text",
+          "text": "Access latency of a few cycles"
+        }
+      ]
+    },
+    {
+      "id": "l2",
+      "title": "L2 Cache",
+      "description": "Mid-level cache backing L1.",
+      "type": "concept",
+      "content": [
+        {
+          "id": "l2-1",
+          "type": "text",
+          "text": "Usually a few hundred KB to 1 MB per core"
+        },
+        {
+          "id": "l2-2",
+          "type": "text",
+          "text": "Slower than L1 but much larger"
+        },
+        {
+          "id": "l2-3",
+          "type": "text",
+          "text": "Catches L1 misses before going to L3"
+        }
+      ]
+    },
+    {
+      "id": "l3",
+      "title": "L3 Cache",
+      "description": "Large cache shared across cores.",
+      "type": "concept",
+      "content": [
+        {
+          "id": "l3-1",
+          "type": "text",
+          "text": "Several MB, shared by all cores"
+        },
+        {
+          "id": "l3-2",
+          "type": "text",
+          "text": "Helps inter-core data sharing"
+        },
+        {
+          "id": "l3-3",
+          "type": "text",
+          "text": "Last stop before main memory"
+        }
+      ]
+    },
+    {
+      "id": "clock-speed",
+      "title": "Clock Speed",
+      "description": "Cycles executed per second.",
+      "type": "concept",
+      "content": [
+        {
+          "id": "clock-speed-1",
+          "type": "text",
+          "text": "Measured in GHz"
+        },
+        {
+          "id": "clock-speed-2",
+          "type": "text",
+          "text": "Higher clocks raise power and heat"
+        },
+        {
+          "id": "clock-speed-3",
+          "type": "text",
+          "text": "Alone it does not determine real performance"
+        }
+      ]
+    },
+    {
+      "id": "cpi",
+      "title": "CPI",
+      "description": "Average cycles required per instruction.",
+      "type": "concept",
+      "content": [
+        {
+          "id": "cpi-1",
+          "type": "text",
+          "text": "Lower CPI means better throughput"
+        },
+        {
+          "id": "cpi-2",
+          "type": "text",
+          "text": "Pipelining pushes CPI toward 1"
+        },
+        {
+          "id": "cpi-3",
+          "type": "text",
+          "text": "Cache misses and stalls raise CPI"
+        }
+      ]
+    },
+    {
+      "id": "instruction-count",
+      "title": "Instruction Count",
+      "description": "Number of instructions a program executes.",
+      "type": "concept",
+      "content": [
+        {
+          "id": "instruction-count-1",
+          "type": "text",
+          "text": "Determined by the ISA and the compiler"
+        },
+        {
+          "id": "instruction-count-2",
+          "type": "text",
+          "text": "CISC uses fewer, richer instructions"
+        },
+        {
+          "id": "instruction-count-3",
+          "type": "text",
+          "text": "RISC uses more, simpler instructions"
+        }
+      ]
+    }
+  ],
+  "edges": [
+    { "source": "root", "target": "cpu", "rel_type": "contains" },
+    { "source": "root", "target": "memory", "rel_type": "contains" },
+    { "source": "root", "target": "io", "rel_type": "contains" },
+    { "source": "root", "target": "storage", "rel_type": "contains" },
+    { "source": "root", "target": "performance", "rel_type": "contains" },
+    { "source": "cpu", "target": "alu", "rel_type": "contains" },
+    { "source": "cpu", "target": "control-unit", "rel_type": "contains" },
+    { "source": "cpu", "target": "registers", "rel_type": "contains" },
+    { "source": "cpu", "target": "instruction-cycle", "rel_type": "contains" },
+    { "source": "memory", "target": "cache", "rel_type": "contains" },
+    { "source": "memory", "target": "ram", "rel_type": "contains" },
+    { "source": "memory", "target": "memory-hierarchy", "rel_type": "contains" },
+    { "source": "cache", "target": "l1", "rel_type": "contains" },
+    { "source": "cache", "target": "l2", "rel_type": "contains" },
+    { "source": "cache", "target": "l3", "rel_type": "contains" },
+    { "source": "performance", "target": "clock-speed", "rel_type": "contains" },
+    { "source": "performance", "target": "cpi", "rel_type": "contains" },
+    { "source": "performance", "target": "instruction-count", "rel_type": "contains" },
+    { "source": "registers", "target": "memory-hierarchy", "rel_type": "related" },
+    { "source": "instruction-cycle", "target": "cpi", "rel_type": "depends_on" },
+    { "source": "storage", "target": "memory-hierarchy", "rel_type": "related" }
+  ]
+}

@@ -1,9 +1,9 @@
-import type { NoteGraph, Relationship } from "../data/types";
+import type { Graph, RelType } from "../data/types";
 import type { Positioned } from "./layout";
 
 import { MarkerType, type Edge } from "@xyflow/react";
 const edgeLooks: Record<
-  Relationship,
+  RelType,
   Pick<Edge, "style" | "animated" | "label" | "markerEnd">
 > = {
   contains: {
@@ -18,19 +18,19 @@ const edgeLooks: Record<
     style: { stroke: "#ffffff", strokeWidth: 2 },
   },
 };
-export function toFlow(graph: NoteGraph, layout: Positioned) {
+export function toFlow(graph: Graph, layout: Positioned) {
   const flowNodes = graph.nodes.map((node) => ({
     id: node.id,
     type: node.type, // must match nodeTypes key
-    position: layout[node.id] ?? { x: 0, y: 0 }, // later: dagre layout
-    data: node, // passed into SectionNode as data
+    position: layout[node.id] ?? { x: 0, y: 0 },
+    data: node,
   }));
   const edges = graph.edges.map((r) => ({
     id: r.id,
     source: r.source,
     target: r.target,
     type: "step",
-    ...edgeLooks[r.relationship],
+    ...edgeLooks[r.rel_type],
   }));
   return { nodes: flowNodes, edges };
 }

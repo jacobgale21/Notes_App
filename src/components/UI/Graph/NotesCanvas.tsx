@@ -11,7 +11,7 @@ import { useMemo } from "react";
 import { NodeNode } from "./SectionNodes";
 import { toFlow } from "../../../lib/toFlow";
 import { layoutGraph } from "../../../lib/layout";
-import type { NodeKind, NoteGraph } from "../../../data/types";
+import type { NodeKind, Graph } from "../../../data/types";
 import Inspector from "./Inspector";
 import { useReactFlow } from "@xyflow/react";
 import GraphSearch from "./GraphSearch";
@@ -27,7 +27,7 @@ export function NotesCanvas({
   onSelect,
   selectedId,
 }: {
-  graph: NoteGraph;
+  graph: Graph;
   onSelect: (id: string | null) => void;
   selectedId: string | null;
 }) {
@@ -81,7 +81,9 @@ export function NotesCanvas({
           <MiniMap position="bottom-left" />
         </ReactFlow>
       </div>
-      {selectedNode && <Inspector node={selectedNode} focusNode={focusNode} />}
+      {selectedNode && (
+        <Inspector node={selectedNode} graph={graph} focusNode={focusNode} />
+      )}
     </div>
   );
 }

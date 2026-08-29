@@ -1,30 +1,35 @@
-import { ListIcon, ListOrderedIcon } from "lucide-react";
-import type { NoteGraph, Node, Relation } from "./types";
+import type { Graph, Node, RelType } from "./types";
 
 export const demoSections: Node[] = [
   {
     id: "arrays",
     title: "Arrays",
-    icon: ListOrderedIcon,
     description: "A contiguous block of memory",
     type: "topic",
-    content: ["O(1) access", "O(n) insertion", "O(n) deletion"],
+    content: [
+      { id: "arrays-1", type: "text", text: "O(1) access" },
+      { id: "arrays-2", type: "text", text: "O(n) insertion" },
+      { id: "arrays-3", type: "text", text: "O(n) deletion" },
+    ],
   },
   {
     id: "lists",
     title: "Linked lists",
-    icon: ListIcon,
     description: "A linked list is a linear data structure",
     type: "topic",
-    content: ["O(1) insert", "O(n) deletion", "O(n) search"],
+    content: [
+      { id: "lists-1", type: "text", text: "O(1) insert" },
+      { id: "lists-2", type: "text", text: "O(n) deletion" },
+      { id: "lists-3", type: "text", text: "O(n) search" },
+    ],
   },
 ];
-export const demoRelations: Relation[] = [
+export const demoRelations = [
   {
     id: "r1",
     source: "arrays",
     target: "lists",
-    relationship: "related",
+    rel_type: "related" as RelType,
   },
 ];
 const n = (
@@ -34,19 +39,30 @@ const n = (
   description: string,
   content: string[],
   subtitle?: string,
-): Node => ({ id, title, type, description, content, subtitle });
+): Node => ({
+  id,
+  title,
+  type,
+  description,
+  subtitle,
+  content: content.map((text, i) => ({
+    id: `${id}-${i + 1}`,
+    type: "text" as const,
+    text,
+  })),
+});
 
 const e = (
   source: string,
   target: string,
-  relationship: Relation["relationship"] = "contains",
-): Relation => ({ id: `${source}-${target}`, source, target, relationship });
+  rel_type: RelType = "contains",
+) => ({ id: `${source}-${target}`, source, target, rel_type });
 
-export const computerArchitecture: NoteGraph = {
+export const computerArchitecture: Graph = {
   id: "computer-architecture",
   title: "Computer Architecture",
   subject: "Computer Science",
-  updatedAt: "2 hours ago",
+  updated_at: "2 hours ago",
   nodes: [
     n(
       "root",

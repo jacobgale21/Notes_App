@@ -1,5 +1,4 @@
-import { getRelatedTopics } from "../../../data/placeholder";
-import type { Node } from "../../../data/types";
+import type { Graph, Node } from "../../../data/types";
 import { motion, AnimatePresence } from "framer-motion";
 import { BookIcon, BrainIcon, StarIcon } from "lucide-react";
 import { Button } from "../button";
@@ -18,14 +17,25 @@ const studyOptions = [
   },
 ];
 
+function relatedNodes(graph: Graph, nodeId: string): Node[] {
+  const ids = new Set<string>();
+  for (const edge of graph.edges) {
+    if (edge.source === nodeId) ids.add(edge.target);
+    if (edge.target === nodeId) ids.add(edge.source);
+  }
+  return graph.nodes.filter((n) => ids.has(n.id));
+}
+
 export default function Inspector({
   node,
+  graph,
   focusNode,
 }: {
   node: Node;
+  graph: Graph;
   focusNode: (id: string) => void;
 }) {
-  const relatedTopics = getRelatedTopics(node);
+  const related = relatedNodes(graph, node.id);
   return (
     <AnimatePresence>
       <motion.aside
@@ -51,7 +61,7 @@ export default function Inspector({
           <ul className="list-disc space-y-1.5 pl-4 text-sm marker:text-accent">
             {node.content.length
               ? node.content.map((bullet, index) => (
-                  <li key={index}>{bullet}</li>
+                  <li key={index}>{bullet.text}</li>
                 ))
               : null}
           </ul>
@@ -60,15 +70,15 @@ export default function Inspector({
           Related Topics
         </h4>
         <div className="flex flex-row items-center justify-start gap-2 px-5">
-          {relatedTopics.length
-            ? relatedTopics.map((topic) => {
+          {related.length
+            ? related.map((topic) => {
                 return (
                   <span
-                    key={topic}
+                    key={topic.id}
                     className="text-sm text-muted shadow-sm rounded-md px-2 py-1 bg-paper cursor-pointer"
-                    onClick={() => focusNode(topic)}
+                    onClick={() => focusNode(topic.id)}
                   >
-                    {topic}
+                    {topic.title}
                   </span>
                 );
               })

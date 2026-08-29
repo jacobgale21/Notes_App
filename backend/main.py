@@ -5,6 +5,7 @@ from routes.userRouter import router as userRouter
 from dotenv import load_dotenv
 from sqlalchemy import text
 from db import engine
+from routes.graphRoutes import router as graphRouter
 load_dotenv()
 # Define your frontend URL (or use ["*"] to allow all origins temporarily)
 origins = ["http://localhost:5173"] 
@@ -22,7 +23,7 @@ app.add_middleware(
 )
 
 app.include_router(userRouter)
-
+app.include_router(graphRouter)
 # 1. Simple GET Endpoint (Health Check / Welcome)
 @app.get("/")
 def read_root():

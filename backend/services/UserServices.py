@@ -28,7 +28,6 @@ def create_user(db: Session, user: User) -> UserModel:
     return db_user
 
 
-
 def login_user(db: Session, user: User) -> UserModel:
     db_user = db.query(UserModel).filter(UserModel.email == user.email).first()
     if not db_user:
