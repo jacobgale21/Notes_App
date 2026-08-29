@@ -33,3 +33,10 @@ export interface Graph {
   nodes: Node[];
   edges: Relation[];
 }
+
+export interface GraphSummary {
+  id: string;
+  title: string;
+  subject: string;
+  updated_at: string;
+}

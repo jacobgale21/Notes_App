@@ -13,7 +13,10 @@ import Login from "./components/pages/login";
 import ProtectedRoute from "./protectedRoute";
 import { refresh } from "./api";
 import { setAccessToken } from "./auth";
-// 1. Create a main App component
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
+
 function App() {
   useEffect(() => {
     refresh().catch(() => setAccessToken(null));
@@ -40,8 +43,10 @@ function App() {
 // 2. Render the App component
 createRoot(document.querySelector("#app")!).render(
   <StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </QueryClientProvider>
   </StrictMode>,
 );

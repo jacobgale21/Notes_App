@@ -3,7 +3,8 @@ import { Button } from "../UI/button";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, BookOpen, Brain, Network, Notebook } from "lucide-react";
 import Header from "../UI/header";
-import { useEffect } from "react";
+import { useGetGraphs } from "../../hooks/useCatalog";
+import type { GraphSummary } from "../../data/types";
 // Placeholder data for the dashboard: will fetch from the user database when developed
 const placehoderData = [
   {
@@ -57,21 +58,26 @@ const recentGraphs = [
 ];
 
 function formatUpdatedAt(isoDate: string): string {
-  const [year, month, day] = isoDate.split("-").map(Number);
-  const then = new Date(year, month - 1, day);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const diffDays = Math.round(
-    (today.getTime() - then.getTime()) / (1000 * 60 * 60 * 24),
+  const then = new Date(isoDate.endsWith("Z") ? isoDate : `${isoDate}Z`);
+  if (Number.isNaN(then.getTime())) return "unknown";
+  const startOfThen = new Date(
+    then.getFullYear(),
+    then.getMonth(),
+    then.getDate(),
   );
-
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+  const diffDays = Math.round(
+    (startOfToday.getTime() - startOfThen.getTime()) / (1000 * 60 * 60 * 24),
+  );
   if (diffDays <= 0) return "today";
   if (diffDays === 1) return "yesterday";
   return `${diffDays} days ago`;
 }
 
 export default function Dashboard() {
+  const { data: graphs } = useGetGraphs();
+  console.log(graphs);
   const navigate = useNavigate();
   return (
     <div className="flex flex-row h-screen">
@@ -115,21 +121,18 @@ export default function Dashboard() {
           <section className="mt-6 w-full">
             <h2>Your Graphs</h2>
             <div className="mt-4 flex flex-row justify-between gap-2 w-full">
-              {recentGraphs.map((graph) => (
+              {graphs?.map((graph: GraphSummary) => (
                 <button
                   key={graph.title}
                   className="flex flex-col items-start justify-center gap-2 bg-background rounded-lg shadow-lg w-full p-6 hover:bg-paper"
-                  onClick={() => navigate(graph.to)}
+                  onClick={() => navigate(`/app/graph/${graph.id}`)}
                 >
                   <span className="text-sm text-muted-foreground rounded-full bg-paper py-1 px-2 mb-2">
                     {graph.subject}
                   </span>
                   <h4>{graph.title}</h4>
-                  <span className="flex flex-row items-center justify-start gap-2 text-md text-muted-foreground">
-                    {graph.concepts} concepts · {graph.links} links
-                  </span>
                   <span className="text-md text-muted-foreground">
-                    Updated {formatUpdatedAt(graph.updatedAt)}
+                    Updated {formatUpdatedAt(graph.updated_at)}
                   </span>
                 </button>
               ))}

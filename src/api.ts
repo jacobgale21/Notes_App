@@ -71,3 +71,8 @@ export const getGraph = async (id: string) => {
   const { data } = await api.get(`/graph/${id}`);
   return data;
 };
+
+export const getGraphs = async () => {
+  const { data } = await api.get("/graph/getall");
+  return data;
+};
