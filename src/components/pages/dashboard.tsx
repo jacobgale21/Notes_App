@@ -3,7 +3,7 @@ import { Button } from "../UI/button";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, BookOpen, Brain, Network, Notebook } from "lucide-react";
 import Header from "../UI/header";
-import { refresh } from "../../api";
+import { useEffect } from "react";
 // Placeholder data for the dashboard: will fetch from the user database when developed
 const placehoderData = [
   {

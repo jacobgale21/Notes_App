@@ -14,8 +14,17 @@ class GraphCreate(BaseModel):
 class GraphSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
     id: UUID
+    user_id: UUID
     title: str
     subject: str
     updated_at: datetime
     nodes: list[NodeSchema]
     edges: list[EdgeSchema]
+
+class GraphSummary(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    title: str
+    subject: str
+    updated_at: datetime

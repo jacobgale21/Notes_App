@@ -1,11 +1,11 @@
 from pathlib import Path
-
+from typing import List
 from sqlalchemy.orm import Session, selectinload
 from fastapi import HTTPException
 from sqlalchemy import select
 import json
-
-from schemas.graphSchema import GraphCreate, GraphSchema
+from models.userModel import User as UserModel
+from schemas.graphSchema import GraphCreate, GraphSchema, GraphSummary
 from models.graphModel import GraphModel
 from models.nodeModel import NodeModel
 from models.edgeModel import EdgeModel
@@ -13,8 +13,8 @@ from models.edgeModel import EdgeModel
 TEST_JSON = Path(__file__).resolve().parent.parent / "test" / "test.json"
 
 
-def create_graph(payload: GraphCreate, db: Session) -> GraphModel:
-    graph = GraphModel(title=payload.title, subject=payload.subject)
+def create_graph(payload: GraphCreate, db: Session, current_user: UserModel) -> GraphModel:
+    graph = GraphModel(title=payload.title, subject=payload.subject, user_id=current_user.id)
     db.add(graph)
     db.flush()
 
@@ -61,10 +61,10 @@ def read_json_file(file_path: Path) -> dict:
         return json.load(file)
 
 
-def create_graph_from_json(db: Session) -> GraphSchema:
+def create_graph_from_json(db: Session, current_user: UserModel) -> GraphSchema:
     data = read_json_file(TEST_JSON)
     payload = GraphCreate.model_validate(data)
-    graph = create_graph(payload, db)
+    graph = create_graph(payload, db, current_user)
     loaded = db.scalar(
         select(GraphModel)
         .options(selectinload(GraphModel.nodes), selectinload(GraphModel.edges))
@@ -73,3 +73,24 @@ def create_graph_from_json(db: Session) -> GraphSchema:
     if loaded is None:
         raise HTTPException(status_code=500, detail="Failed to reload graph")
     return GraphSchema.model_validate(loaded)
+
+
+
+def get_all_graphs(db: Session, current_user: UserModel) -> list[GraphSummary]:
+    rows = db.execute(
+        select(
+            GraphModel.id,
+            GraphModel.title,
+            GraphModel.subject,
+            GraphModel.updated_at,
+        ).where(GraphModel.user_id == current_user.id)
+    ).all()
+    return [
+        GraphSummary(
+            id=row.id,
+            title=row.title,
+            subject=row.subject,
+            updated_at=row.updated_at,
+        )
+        for row in rows
+    ]

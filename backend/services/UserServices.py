@@ -78,3 +78,4 @@ def set_refresh_cookie(response: Response, token: str) -> None:
         max_age=7 * 24 * 60 * 60,
         path="/user",        
     )
+
