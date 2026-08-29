@@ -48,33 +48,67 @@ interface User {
 }
 
 export const signup = async (user: User) => {
-  const { data } = await api.post("/user/signup", user);
-  setAccessToken(data.access_token);
+  try {
+    const { data } = await api.post("/user/signup", user);
+    setAccessToken(data.access_token);
+  } catch (error) {
+    setAccessToken(null);
+    throw error;
+  }
 };
 
 export const login = async (user: User) => {
-  const { data } = await api.post("/user/login", user);
-  setAccessToken(data.access_token);
+  try {
+    const { data } = await api.post("/user/login", user);
+    setAccessToken(data.access_token);
+  } catch (error) {
+    setAccessToken(null);
+    throw error;
+  }
+};
+
+export const logout = async () => {
+  try {
+    await api.post("/user/logout");
+  } finally {
+    setAccessToken(null);
+  }
 };
 
 export const refresh = async () => {
-  const { data } = await api.post("/user/refresh");
-  setAccessToken(data.access_token);
+  try {
+    const { data } = await api.post("/user/refresh");
+    setAccessToken(data.access_token);
+  } catch (error) {
+    setAccessToken(null);
+    throw error;
+  }
 };
 
 export const createGraph = async (): Promise<Graph> => {
-  const { data } = await api.post<Graph>("/graph");
-  return data;
+  try {
+    const { data } = await api.post<Graph>("/graph");
+    return data;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const getGraphById = async (id: string) => {
   console.log("getGraphById", id);
-  const { data } = await api.get(`/graph/get/${id}`);
-  console.log(data);
-  return data;
+  try {
+    const { data } = await api.get(`/graph/get/${id}`);
+    return data;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const getGraphs = async () => {
-  const { data } = await api.get("/graph/getall");
-  return data;
+  try {
+    const { data } = await api.get("/graph/getall");
+    return data;
+  } catch (error) {
+    throw error;
+  }
 };

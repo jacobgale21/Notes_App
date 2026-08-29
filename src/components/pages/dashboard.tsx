@@ -29,34 +29,6 @@ const placehoderData = [
   },
 ];
 
-// Placeholder data for the recent graphs: will fetch from the user database when developed
-const recentGraphs = [
-  {
-    title: "Computer Architecture",
-    subject: "Computer Science",
-    concepts: 19,
-    links: 12,
-    updatedAt: "2026-08-25",
-    to: "/app/graph/1",
-  },
-  {
-    title: "Operating Systems",
-    subject: "Computer Science",
-    concepts: 12,
-    links: 8,
-    updatedAt: "2026-08-24",
-    to: "/app/graph/2",
-  },
-  {
-    title: "Database Systems",
-    subject: "Computer Science",
-    concepts: 15,
-    links: 10,
-    updatedAt: "2026-08-23",
-    to: "/app/graph/3",
-  },
-];
-
 function formatUpdatedAt(isoDate: string): string {
   const then = new Date(isoDate.endsWith("Z") ? isoDate : `${isoDate}Z`);
   if (Number.isNaN(then.getTime())) return "unknown";
@@ -77,7 +49,6 @@ function formatUpdatedAt(isoDate: string): string {
 
 export default function Dashboard() {
   const { data: graphs } = useGetGraphs();
-  console.log(graphs);
   const navigate = useNavigate();
   return (
     <div className="flex flex-row h-screen">

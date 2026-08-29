@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { Button } from "./button";
 import { Link } from "react-router-dom";
+import { logout } from "../../api";
 
 const allButtons = [
   {
@@ -72,6 +73,12 @@ export default function Sidebar() {
           </Button>
         ))}
       </div>
+      <Button
+        variant="destructive"
+        onClick={() => logout().catch((error) => console.error(error))}
+      >
+        Logout
+      </Button>
     </div>
   );
 }

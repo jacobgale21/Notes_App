@@ -79,3 +79,10 @@ def set_refresh_cookie(response: Response, token: str) -> None:
         path="/user",        
     )
 
+def clear_refresh_cookie(response: Response) -> None:
+    response.delete_cookie(
+        key=REFRESH_COOKIE,
+        path="/user",
+        samesite="lax",
+        secure=False,
+    )

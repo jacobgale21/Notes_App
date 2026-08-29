@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import List
 from sqlalchemy.orm import Session, selectinload
 from fastapi import HTTPException
-from sqlalchemy import select
+from sqlalchemy import select, desc
 import json
 from models.userModel import User as UserModel
 from schemas.graphSchema import GraphCreate, GraphSchema, GraphSummary
@@ -84,7 +84,7 @@ def get_all_graphs(db: Session, current_user: UserModel) -> list[GraphSummary]:
             GraphModel.title,
             GraphModel.subject,
             GraphModel.updated_at,
-        ).where(GraphModel.user_id == current_user.id)
+        ).where(GraphModel.user_id == current_user.id).order_by(desc(GraphModel.updated_at))
     ).all()
     return [
         GraphSummary(

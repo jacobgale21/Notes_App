@@ -3,7 +3,7 @@ from schemas.User import User
 from sqlalchemy.orm import Session
 from db import get_db
 from fastapi import Depends, Response, Cookie, HTTPException
-from services.UserServices import create_user, login_user, access_token_create, refresh_token_create, set_refresh_cookie
+from services.UserServices import create_user, login_user, access_token_create, refresh_token_create, set_refresh_cookie, clear_refresh_cookie
 from services.deps import get_current_user
 from models.userModel import User as UserModel
 import jwt
@@ -49,3 +49,8 @@ def refresh(
     new_refresh = refresh_token_create(user)
     set_refresh_cookie(response, new_refresh)  # rotate
     return {"access_token": access, "token_type": "bearer"}
+
+@router.post("/logout")
+def logout(response: Response):
+    clear_refresh_cookie(response)
+    return {"ok": True}
