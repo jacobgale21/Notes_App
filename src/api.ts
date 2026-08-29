@@ -67,8 +67,10 @@ export const createGraph = async (): Promise<Graph> => {
   return data;
 };
 
-export const getGraph = async (id: string) => {
-  const { data } = await api.get(`/graph/${id}`);
+export const getGraphById = async (id: string) => {
+  console.log("getGraphById", id);
+  const { data } = await api.get(`/graph/get/${id}`);
+  console.log(data);
   return data;
 };
 

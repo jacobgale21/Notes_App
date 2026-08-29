@@ -1,37 +1,18 @@
 import { ReactFlowProvider } from "@xyflow/react";
 import { useState } from "react";
 import { NotesCanvas } from "../UI/Graph/NotesCanvas";
-import type { Graph } from "../../data/types";
-import { createGraph } from "../../api";
-import { Button } from "../UI/button";
+import { useParams } from "react-router-dom";
+import { useGraph } from "../../hooks/useCatalog";
 
 export function GraphView() {
-  const [graph, setGraph] = useState<Graph | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const { id } = useParams();
+  const { data: graph, isPending, isError } = useGraph(id ?? "");
 
-  if (!graph) {
-    return (
-      <div className="flex min-h-[50vh] flex-col items-center justify-center gap-3">
-        {error ? <p className="text-sm text-danger">{error}</p> : null}
-        <Button
-          onClick={() => {
-            setError(null);
-            createGraph()
-              .then(setGraph)
-              .catch((err) => {
-                console.error(err);
-                setError(
-                  err.response?.data?.detail ?? "Failed to create graph",
-                );
-              });
-          }}
-        >
-          Create Graph
-        </Button>
-      </div>
-    );
-  }
+  if (!id || isPending) return <p>Loading…</p>;
+  if (isError || !graph) return <p>Graph not found</p>;
+
+  console.log(graph);
 
   return (
     <ReactFlowProvider>

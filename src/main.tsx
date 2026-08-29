@@ -39,7 +39,7 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/upload" element={<Page />} />
-          <Route path="/graph" element={<GraphView />} />
+          <Route path="/graph/:id" element={<GraphView />} />
         </Route>
       </Route>
       <Route element={<ProtectedRoute />}>

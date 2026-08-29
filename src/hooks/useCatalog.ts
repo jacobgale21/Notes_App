@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { createGraph, getGraph, getGraphs } from "../api";
+import { createGraph, getGraphById, getGraphs } from "../api";
 
 export function createGraphHook() {
   return useQuery({
@@ -10,8 +10,9 @@ export function createGraphHook() {
 
 export function useGraph(id: string) {
   return useQuery({
-    queryKey: ["graphs"],
-    queryFn: () => getGraph(id),
+    queryKey: ["graphs", id],
+    enabled: !!id,
+    queryFn: () => getGraphById(id),
   });
 }
 

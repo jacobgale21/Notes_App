@@ -95,12 +95,12 @@ export default function Dashboard() {
             </p>
             <div className="mt-5 flex flex-wrap gap-2">
               <Button asChild variant="brand">
-                <Link to="/app/graph/$graphId">
+                <Link to="/graph/$graphId">
                   Resume graph <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
               <Button asChild variant="outline">
-                <Link to="/app/study/$graphId">Study now</Link>
+                <Link to="study/$graphId">Study now</Link>
               </Button>
             </div>
           </header>
@@ -125,7 +125,7 @@ export default function Dashboard() {
                 <button
                   key={graph.title}
                   className="flex flex-col items-start justify-center gap-2 bg-background rounded-lg shadow-lg w-full p-6 hover:bg-paper"
-                  onClick={() => navigate(`/app/graph/${graph.id}`)}
+                  onClick={() => navigate(`/graph/${graph.id}`)}
                 >
                   <span className="text-sm text-muted-foreground rounded-full bg-paper py-1 px-2 mb-2">
                     {graph.subject}
