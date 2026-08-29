@@ -7,6 +7,8 @@ from services.deps import get_current_user
 from models.userModel import User as UserModel
 from typing import List
 from services.graphServices import get_all_graphs
+from services.graphServices import get_graph_by_id
+from uuid import UUID
 router = APIRouter(prefix="/graph", tags=["graph"])
 
 
@@ -17,3 +19,7 @@ async def seed_test_graph(db: Session = Depends(get_db), current_user: UserModel
 @router.get("/getall", response_model=List[GraphSummary])
 async def get_graphs(db: Session = Depends(get_db), current_user: UserModel = Depends(get_current_user)):
     return get_all_graphs(db, current_user)
+
+@router.get("/get/{id}", response_model=GraphSchema)
+async def get_graph(id: UUID, db: Session = Depends(get_db), current_user: UserModel = Depends(get_current_user)):
+    return get_graph_by_id(db, current_user, id)

@@ -9,6 +9,7 @@ from schemas.graphSchema import GraphCreate, GraphSchema, GraphSummary
 from models.graphModel import GraphModel
 from models.nodeModel import NodeModel
 from models.edgeModel import EdgeModel
+from uuid import UUID
 
 TEST_JSON = Path(__file__).resolve().parent.parent / "test" / "test.json"
 
@@ -94,3 +95,13 @@ def get_all_graphs(db: Session, current_user: UserModel) -> list[GraphSummary]:
         )
         for row in rows
     ]
+
+def get_graph_by_id(db: Session, current_user: UserModel, id: UUID) -> GraphSchema:
+    row = db.scalar(
+        select(GraphModel)
+        .options(selectinload(GraphModel.nodes), selectinload(GraphModel.edges))
+        .where(GraphModel.id == id, GraphModel.user_id == current_user.id)
+    )
+    if row is None:
+        raise HTTPException(status_code=404, detail="Graph not found")
+    return GraphSchema.model_validate(row)
