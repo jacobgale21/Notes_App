@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getNotes } from "../../api";
+import { getNotes, storeGraph } from "../../api";
 import { UploadCloud, FileText } from "lucide-react";
 import "@xyflow/react/dist/style.css";
 import { Button } from "../UI/button";
@@ -8,11 +8,13 @@ import StarterKit from "@tiptap/starter-kit";
 import { TextStyle } from "@tiptap/extension-text-style";
 import { FontFamily } from "@tiptap/extension-font-family";
 import Placeholder from "@tiptap/extension-placeholder";
+import { useNavigate } from "react-router-dom";
 
-export default function Page() {
+export default function Upload() {
   const [notes, setNotes] = useState<File | null>(null);
   const [error, setError] = useState("");
   const [selectedTab, setSelectedTab] = useState("upload");
+  const navigate = useNavigate();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -36,9 +38,6 @@ export default function Page() {
       setError("Please select a valid PDF or Word document.");
     }
   };
-  const handleGetNotes = async () => {
-    const response = await getNotes();
-  };
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -56,6 +55,19 @@ export default function Page() {
       },
     },
   });
+  const handleSubmit = async () => {
+    const notes = editor?.getText().trim();
+    if (!notes) {
+      setError("Please enter some notes.");
+      return;
+    }
+    try {
+      const id = await storeGraph(notes);
+      navigate(`/graph/${id}`);
+    } catch (error) {
+      setError("Failed to store graph.");
+    }
+  };
 
   return (
     <div className="flex min-h-screen flex-col bg-paper text-ink">
@@ -114,7 +126,7 @@ export default function Page() {
           asChild
           variant="brand"
           className="mt-4 w-full max-w-lg"
-          onClick={handleGetNotes}
+          onClick={handleSubmit}
         >
           Generate Knowledge Graph
         </Button>

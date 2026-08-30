@@ -47,6 +47,10 @@ interface User {
   password: string;
 }
 
+interface GenerateGraphRequest {
+  id: string;
+}
+
 export const signup = async (user: User) => {
   try {
     const { data } = await api.post("/user/signup", user);
@@ -108,6 +112,17 @@ export const getGraphs = async () => {
   try {
     const { data } = await api.get("/graph/getall");
     return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const storeGraph = async (notes: string): Promise<string> => {
+  try {
+    const { data } = await api.post<{ id: string }>("/graph/generate", {
+      notes,
+    });
+    return data.id;
   } catch (error) {
     throw error;
   }

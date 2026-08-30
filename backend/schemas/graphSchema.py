@@ -28,3 +28,6 @@ class GraphSummary(BaseModel):
     title: str
     subject: str
     updated_at: datetime
+
+class GenerateGraphRequest(BaseModel):
+    notes: str

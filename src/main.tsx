@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./style.css";
 import "@xyflow/react/dist/style.css";
 import NavBar from "./components/UI/navBar";
-import Page from "./components/pages/page";
+import Upload from "./components/pages/upload";
 import { GraphView } from "./components/pages/graph";
 import Home from "./components/pages/home";
 import Dashboard from "./components/pages/dashboard";
@@ -14,7 +14,6 @@ import ProtectedRoute from "./protectedRoute";
 import { refresh } from "./api";
 import { setAccessToken } from "./auth";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import Graphs from "./components/pages/notes";
 import Notes from "./components/pages/notes";
 
 const queryClient = new QueryClient({
@@ -40,7 +39,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route element={<ProtectedRoute />}>
-          <Route path="/upload" element={<Page />} />
+          <Route path="/upload" element={<Upload />} />
           <Route path="/graph/:id" element={<GraphView />} />
           <Route path="/notes" element={<Notes />} />
         </Route>

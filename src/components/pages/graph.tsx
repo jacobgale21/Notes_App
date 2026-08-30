@@ -13,8 +13,6 @@ export function GraphView() {
   if (!id || isPending) return <Loading label="Loading graph..." />;
   if (isError || !graph) return <p>Graph not found</p>;
 
-  console.log(graph);
-
   return (
     <ReactFlowProvider>
       <div className="flex h-[calc(100vh-4rem)] min-h-0">

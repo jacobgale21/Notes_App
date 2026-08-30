@@ -1,9 +1,6 @@
-import { useState } from "react";
 import { useGetGraphs } from "../../hooks/useCatalog";
 import Sidebar from "../UI/sidebar";
-import { Button } from "../UI/button";
-import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import type { GraphSummary } from "../../data/types";
 import { formatUpdatedAt } from "../../lib/format";
 import Header from "../UI/header";
@@ -11,8 +8,6 @@ import Header from "../UI/header";
 export default function Notes() {
   const navigate = useNavigate();
   const { data: graphs } = useGetGraphs();
-  const [numberOfGraphs, setNumberOfGraphs] = useState(graphs?.length ?? 0);
-
   return (
     <div className="flex flex-row h-screen">
       <div className="w-1/6 h-full">
