@@ -20,7 +20,7 @@ const allButtons = [
   {
     icon: Network,
     label: "My Graphs",
-    to: "/graph",
+    to: "/graphs",
   },
   {
     icon: FileText,

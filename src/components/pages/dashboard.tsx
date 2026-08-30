@@ -6,6 +6,7 @@ import Header from "../UI/header";
 import { useGetGraphs } from "../../hooks/useCatalog";
 import type { GraphSummary } from "../../data/types";
 import { useState } from "react";
+import { formatUpdatedAt } from "../../lib/format";
 // Placeholder data for the dashboard: will fetch from the user database when developed
 const placeholderData = [
   {
@@ -29,24 +30,6 @@ const placeholderData = [
     icon: BookOpen,
   },
 ];
-
-function formatUpdatedAt(isoDate: string): string {
-  const then = new Date(isoDate.endsWith("Z") ? isoDate : `${isoDate}Z`);
-  if (Number.isNaN(then.getTime())) return "unknown";
-  const startOfThen = new Date(
-    then.getFullYear(),
-    then.getMonth(),
-    then.getDate(),
-  );
-  const startOfToday = new Date();
-  startOfToday.setHours(0, 0, 0, 0);
-  const diffDays = Math.round(
-    (startOfToday.getTime() - startOfThen.getTime()) / (1000 * 60 * 60 * 24),
-  );
-  if (diffDays <= 0) return "today";
-  if (diffDays === 1) return "yesterday";
-  return `${diffDays} days ago`;
-}
 
 export default function Dashboard() {
   const { data: graphs } = useGetGraphs();

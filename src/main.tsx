@@ -14,6 +14,8 @@ import ProtectedRoute from "./protectedRoute";
 import { refresh } from "./api";
 import { setAccessToken } from "./auth";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import Graphs from "./components/pages/notes";
+import Notes from "./components/pages/notes";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -40,6 +42,7 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route path="/upload" element={<Page />} />
           <Route path="/graph/:id" element={<GraphView />} />
+          <Route path="/notes" element={<Notes />} />
         </Route>
       </Route>
       <Route element={<ProtectedRoute />}>

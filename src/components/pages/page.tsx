@@ -38,7 +38,6 @@ export default function Page() {
   };
   const handleGetNotes = async () => {
     const response = await getNotes();
-    console.log(response);
   };
   const editor = useEditor({
     extensions: [
