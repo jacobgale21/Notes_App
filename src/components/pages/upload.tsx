@@ -8,7 +8,7 @@ import { TextStyle } from "@tiptap/extension-text-style";
 import { FontFamily } from "@tiptap/extension-font-family";
 import Placeholder from "@tiptap/extension-placeholder";
 import { useNavigate } from "react-router-dom";
-import { useGenerateGraph } from "../../hooks/useCatalog";
+import { useStoreGraph } from "../../hooks/useCatalog";
 
 export default function Upload() {
   const [notes, setNotes] = useState<File | null>(null);
@@ -16,8 +16,8 @@ export default function Upload() {
   const [selectedTab, setSelectedTab] = useState("upload");
   const navigate = useNavigate();
 
-  const { mutate: generateGraph } = useGenerateGraph();
-  const { mutateAsync, isPending } = useGenerateGraph();
+  const { mutate: storeGraph } = useStoreGraph();
+  const { mutateAsync, isPending } = useStoreGraph();
   const handleSubmit = async () => {
     const notes = editor?.getText().trim();
     if (!notes) return;

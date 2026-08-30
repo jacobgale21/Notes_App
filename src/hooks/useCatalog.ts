@@ -1,10 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { createGraph, getGraphById, getGraphs } from "../api";
+import { getGraphById, getGraphs, storeGraph } from "../api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { storeGraph } from "../api"; // POST, returns Graph
 import type { Graph } from "../data/types";
 
-export function useGenerateGraph() {
+export function useStoreGraph() {
   const queryClient = useQueryClient();
 
   return useMutation({

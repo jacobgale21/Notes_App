@@ -29,7 +29,7 @@ export function toFlow(graph: Graph, layout: Positioned) {
     id: r.id,
     source: r.source,
     target: r.target,
-    type: "step",
+    type: "smoothstep",
     ...edgeLooks[r.rel_type],
   }));
   return { nodes: flowNodes, edges };

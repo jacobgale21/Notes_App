@@ -3,7 +3,7 @@ import type { Graph } from "../data/types";
 export type Positioned = Record<string, { x: number; y: number }>;
 
 const COL_WIDTH = 340;
-const ROW_HEIGHT = 130;
+const ROW_HEIGHT = 225;
 
 /**
  * Simple deterministic hierarchical (left-to-right tree) layout.

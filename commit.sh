@@ -12,5 +12,5 @@ fi
 # Run the Git commands using the stored variable
 git add .
 git commit -m "$commit_msg"
-
+git push origin main
 echo "Changes committed successfully!"
