@@ -10,6 +10,7 @@ from models.graphModel import GraphModel
 from models.nodeModel import NodeModel
 from models.edgeModel import EdgeModel
 from uuid import UUID
+import uuid
 from google import genai
 from google.genai import types
 import os
@@ -20,8 +21,9 @@ load_dotenv()
 TEST_JSON = Path(__file__).resolve().parent.parent / "test" / "test.json"
 
 
-def store_graph(payload: GraphCreate, db: Session, current_user: UserModel) -> GraphModel:
-    graph = GraphModel(title=payload.title, subject=payload.subject, user_id=current_user.id)
+def store_graph(payload: GraphCreate, db: Session, current_user_id: uuid.UUID) -> GraphModel:
+    nodes: list[tuple[str, NodeModel]] = []
+    graph = GraphModel(title=payload.title, subject=payload.subject, user_id=current_user_id)
     db.add(graph)
     db.flush()
 
@@ -39,8 +41,10 @@ def store_graph(payload: GraphCreate, db: Session, current_user: UserModel) -> G
             content=[block.model_dump() for block in node.content],
         )
         db.add(row)
-        db.flush()
-        slug_to_uuid[node.id] = row.id
+        nodes.append((node.id, row))
+    db.flush()
+
+    slug_to_uuid = { slug: row.id for slug, row in nodes }
 
     for edge in payload.edges:
         try:
@@ -68,10 +72,10 @@ def read_json_file(file_path: Path) -> dict:
         return json.load(file)
 
 
-def create_graph_from_json(db: Session, current_user: UserModel) -> GraphSchema:
+def create_graph_from_json(db: Session, current_user_id: uuid.UUID) -> GraphSchema:
     data = read_json_file(TEST_JSON)
     payload = GraphCreate.model_validate(data)
-    graph = create_store(payload, db, current_user)
+    graph = store_graph(payload, db, current_user_id)
     loaded = db.scalar(
         select(GraphModel)
         .options(selectinload(GraphModel.nodes), selectinload(GraphModel.edges))
@@ -83,14 +87,14 @@ def create_graph_from_json(db: Session, current_user: UserModel) -> GraphSchema:
 
 
 
-def get_all_graphs(db: Session, current_user: UserModel) -> list[GraphSummary]:
+def get_all_graphs(db: Session, current_user_id: uuid.UUID) -> list[GraphSummary]:
     rows = db.execute(
         select(
             GraphModel.id,
             GraphModel.title,
             GraphModel.subject,
             GraphModel.updated_at,
-        ).where(GraphModel.user_id == current_user.id).order_by(desc(GraphModel.updated_at))
+        ).where(GraphModel.user_id == current_user_id).order_by(desc(GraphModel.updated_at))
     ).all()
     return [
         GraphSummary(
@@ -102,11 +106,11 @@ def get_all_graphs(db: Session, current_user: UserModel) -> list[GraphSummary]:
         for row in rows
     ]
 
-def get_graph_by_id(db: Session, current_user: UserModel, id: UUID) -> GraphSchema:
+def get_graph_by_id(db: Session, current_user_id: uuid.UUID, id: UUID) -> GraphSchema:
     row = db.scalar(
         select(GraphModel)
         .options(selectinload(GraphModel.nodes), selectinload(GraphModel.edges))
-        .where(GraphModel.id == id, GraphModel.user_id == current_user.id)
+        .where(GraphModel.id == id, GraphModel.user_id == current_user_id)
     )
     if row is None:
         raise HTTPException(status_code=404, detail="Graph not found")
@@ -200,7 +204,7 @@ If the notes are messy, still produce a single, valid graph: group related fragm
     payload = GraphCreate.model_validate_json(response.text)
     return payload
 
-def generate_graph(db: Session, current_user: UserModel, notes: str) -> UUID:
+def generate_graph(db: Session, current_user_id: uuid.UUID, notes: str) -> GraphSchema:
     try:
         if notes is None or notes == "":
             print("Notes are required")
@@ -211,10 +215,9 @@ def generate_graph(db: Session, current_user: UserModel, notes: str) -> UUID:
         else:
             # Generate Graph from Notes with LLM
             payload = create_graph(notes)
-            graph = store_graph(payload, db, current_user)
-            
-            return graph.id
-        
+            graph = store_graph(payload, db, current_user_id)
+            return GraphSchema.model_validate(graph)
+
     except Exception as error:
         print(f"Failed to generate graph: {error}")
         raise HTTPException(status_code=500, detail=f"Failed to generate graph: {error}") from error

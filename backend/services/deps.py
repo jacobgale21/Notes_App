@@ -29,3 +29,17 @@ def get_current_user(
         raise HTTPException(status_code=401, detail="Invalid token")
     return user
 
+def get_current_user_id(
+    creds: HTTPAuthorizationCredentials = Depends(bearer),
+) -> uuid.UUID:
+    try:
+        payload = jwt.decode(
+            creds.credentials,
+            os.environ["SECRET_KEY"],
+            algorithms=["HS256"],
+        )
+    except jwt.PyJWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    if payload.get("type") != "access":
+        raise HTTPException(status_code=401, detail="Invalid token")
+    return uuid.UUID(payload["sub"])

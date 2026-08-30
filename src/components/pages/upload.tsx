@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getNotes, storeGraph } from "../../api";
+import { storeGraph } from "../../api";
 import { UploadCloud, FileText } from "lucide-react";
 import "@xyflow/react/dist/style.css";
 import { Button } from "../UI/button";
@@ -9,12 +9,22 @@ import { TextStyle } from "@tiptap/extension-text-style";
 import { FontFamily } from "@tiptap/extension-font-family";
 import Placeholder from "@tiptap/extension-placeholder";
 import { useNavigate } from "react-router-dom";
+import { useGenerateGraph } from "../../hooks/useCatalog";
 
 export default function Upload() {
   const [notes, setNotes] = useState<File | null>(null);
   const [error, setError] = useState("");
   const [selectedTab, setSelectedTab] = useState("upload");
   const navigate = useNavigate();
+
+  const { mutate: generateGraph } = useGenerateGraph();
+  const { mutateAsync, isPending } = useGenerateGraph();
+  const handleSubmit = async () => {
+    const notes = editor?.getText().trim();
+    if (!notes) return;
+    const graph = await mutateAsync(notes);
+    navigate(`/graph/${graph.id}`);
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -55,19 +65,6 @@ export default function Upload() {
       },
     },
   });
-  const handleSubmit = async () => {
-    const notes = editor?.getText().trim();
-    if (!notes) {
-      setError("Please enter some notes.");
-      return;
-    }
-    try {
-      const id = await storeGraph(notes);
-      navigate(`/graph/${id}`);
-    } catch (error) {
-      setError("Failed to store graph.");
-    }
-  };
 
   return (
     <div className="flex min-h-screen flex-col bg-paper text-ink">

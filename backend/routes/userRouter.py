@@ -46,8 +46,8 @@ def refresh(
         raise HTTPException(status_code=401, detail="Invalid token")
     user = db.get(UserModel, uuid.UUID(payload["sub"]))
     access = access_token_create(user)
-    new_refresh = refresh_token_create(user)
-    set_refresh_cookie(response, new_refresh)  # rotate
+    # new_refresh = refresh_token_create(user)
+    # set_refresh_cookie(response, new_refresh)  # rotate
     return {"access_token": access, "token_type": "bearer"}
 
 @router.post("/logout")
