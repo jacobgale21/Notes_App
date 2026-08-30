@@ -19,13 +19,6 @@ export function useGenerateGraph() {
   });
 }
 
-export function createGraphHook() {
-  return useQuery({
-    queryKey: ["graphs"],
-    queryFn: createGraph,
-  });
-}
-
 export function useGraph(id: string) {
   return useQuery({
     queryKey: ["graphs", id],

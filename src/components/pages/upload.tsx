@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { storeGraph } from "../../api";
 import { UploadCloud, FileText } from "lucide-react";
 import "@xyflow/react/dist/style.css";
 import { Button } from "../UI/button";

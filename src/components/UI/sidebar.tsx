@@ -8,9 +8,10 @@ import {
   Settings,
 } from "lucide-react";
 import { Button } from "./button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { logout } from "../../api";
-
+import { useGetGraphs } from "../../hooks/useCatalog";
+import type { Graph } from "../../data/types";
 const allButtons = [
   {
     icon: Home,
@@ -44,6 +45,11 @@ const allButtons = [
   },
 ];
 export default function Sidebar() {
+  const navigate = useNavigate();
+  const { data: graphs } = useGetGraphs();
+  const sections = new Set<string>(
+    graphs?.map((graph: Graph) => graph.subject) ?? [],
+  );
   return (
     <div className="flex flex-col h-full border-r border-black/50 p-4 gap-4">
       <header className="flex flex-row items-center mb-4">
@@ -73,12 +79,23 @@ export default function Sidebar() {
           </Button>
         ))}
       </div>
-      <Button
-        variant="destructive"
-        onClick={() => logout().catch((error) => console.error(error))}
-      >
-        Logout
-      </Button>
+      <div className="flex flex-col gap-3">
+        <h4>Subjects</h4>
+        {[...sections].map((section) => (
+          <Button variant="outline" key={section}>
+            <Link to={`/section/${section}`}>
+              <span>{section}</span>
+            </Link>
+          </Button>
+        ))}
+
+        <Button
+          variant="destructive"
+          onClick={() => logout().catch((error) => console.error(error))}
+        >
+          Logout
+        </Button>
+      </div>
     </div>
   );
 }
