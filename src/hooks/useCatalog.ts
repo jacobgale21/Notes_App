@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { getGraphById, getGraphs, storeGraph } from "../api";
+import { deleteGraph, getGraphById, getGraphs, storeGraph } from "../api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { Graph } from "../data/types";
+import type { Graph, GraphSummary } from "../data/types";
 
 export function useStoreGraph() {
   const queryClient = useQueryClient();
@@ -31,5 +31,19 @@ export function useGetGraphs() {
   return useQuery({
     queryKey: ["graphs"],
     queryFn: () => getGraphs(),
+  });
+}
+
+export function useDeleteGraph() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => deleteGraph(id),
+    onSuccess: (_data, id) => {
+      queryClient.removeQueries({ queryKey: ["graphs", id] });
+      queryClient.setQueryData(["graphs"], (old: GraphSummary[] | undefined) =>
+        old?.filter((g) => g.id !== id),
+      );
+    },
   });
 }

@@ -1,12 +1,20 @@
 import Sidebar from "../UI/sidebar";
 import { Button } from "../UI/button";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight, BookOpen, Brain, Network, Notebook } from "lucide-react";
+import {
+  ArrowRight,
+  BookOpen,
+  Brain,
+  Loader,
+  Network,
+  Notebook,
+} from "lucide-react";
 import Header from "../UI/header";
-import { useGetGraphs } from "../../hooks/useCatalog";
+import { useDeleteGraph, useGetGraphs } from "../../hooks/useCatalog";
 import type { GraphSummary } from "../../data/types";
 import { useState } from "react";
 import { formatUpdatedAt } from "../../lib/format";
+import { useMutation } from "@tanstack/react-query";
 // Placeholder data for the dashboard: will fetch from the user database when developed
 const placeholderData = [
   {
@@ -34,8 +42,9 @@ const placeholderData = [
 export default function Dashboard() {
   const { data: graphs } = useGetGraphs();
   const [numberOfGraphs, setNumberOfGraphs] = useState(graphs?.length ?? 0);
-
+  const { mutate, isPending, isError, error } = useDeleteGraph();
   const navigate = useNavigate();
+
   return (
     <div className="flex flex-row h-screen">
       <div className="w-1/6 h-full">
@@ -90,21 +99,44 @@ export default function Dashboard() {
           </section>
           <section className="mt-6 w-full">
             <h2>Your Graphs</h2>
-            <div className="mt-4 flex flex-row justify-between gap-2 w-full">
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 justify-between gap-2 w-full">
               {graphs?.map((graph: GraphSummary) => (
-                <button
+                <div
                   key={graph.title}
-                  className="flex flex-col items-start justify-center gap-2 bg-background rounded-lg shadow-lg w-full p-6 hover:bg-paper"
+                  className="group relative flex flex-col items-start justify-center gap-2 bg-background rounded-lg shadow-lg w-full p-4 hover:bg-paper"
                   onClick={() => navigate(`/graph/${graph.id}`)}
                 >
-                  <span className="text-sm text-muted-foreground rounded-full bg-paper py-1 px-2 mb-2">
-                    {graph.subject}
-                  </span>
-                  <h4>{graph.title}</h4>
-                  <span className="text-md text-muted-foreground">
-                    Updated {formatUpdatedAt(graph.updated_at)}
-                  </span>
-                </button>
+                  <div className="flex items-center justify-between w-full mb-4">
+                    <span className="text-xs font-medium tracking-wide text-muted-foreground uppercase bg-secondary/80 px-2.5 py-1 rounded-md">
+                      {graph.subject}
+                    </span>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      className="opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        mutate(graph.id);
+                      }}
+                    >
+                      {isPending ? (
+                        <Loader className="h-4 w-4 animate-spin" />
+                      ) : (
+                        "Delete"
+                      )}
+                    </Button>
+                  </div>
+
+                  {/* Content Area */}
+                  <div className="space-y-1">
+                    <h4 className="text-lg font-semibold tracking-tight text-foreground">
+                      {graph.title}
+                    </h4>
+                    <p className="text-xs text-muted-foreground">
+                      Updated {formatUpdatedAt(graph.updated_at)}
+                    </p>
+                  </div>
+                </div>
               ))}
             </div>
           </section>

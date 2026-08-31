@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Form, File, UploadFile, HTTPException
 from sqlalchemy.orm import Session
 from db import get_db
-from services.graph.graphServices import create_graph_from_json, generate_graph, get_graph_by_id, get_all_graphs
+from services.graph.graphServices import create_graph_from_json, generate_graph, get_graph_by_id, get_all_graphs, delete_graph_endpoint
 from services.graph.helper import read_pdf_file, read_word_file
 from schemas.graphSchema import GraphSchema, GraphSummary
 from services.deps import get_current_user_id
@@ -60,3 +60,7 @@ async def generate_graph_endpoint( db: Session = Depends(get_db), current_user_i
 
     # generate the graph
     return generate_graph(db, current_user_id, text)
+
+@router.delete("/delete/{id}")
+async def delete_graph(id: UUID, db: Session = Depends(get_db), current_user_id: uuid.UUID = Depends(get_current_user_id)):
+    return delete_graph_endpoint(db, current_user_id, id)

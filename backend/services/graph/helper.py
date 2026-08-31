@@ -6,7 +6,7 @@ from docx import Document
 def read_pdf_file(pdf_file: UploadFile) -> str:
     if pdf_file.content_type not in ("application/pdf", "application/x-pdf"):
         raise HTTPException(status_code=400, detail="File must be a PDF")
-
+    
     data = pdf_file.file.read() 
     if not data:
         raise HTTPException(status_code=400, detail="Empty file")
@@ -35,7 +35,7 @@ def read_word_file(word_file: UploadFile) -> str:
         for table in doc.tables:
             for row in table.rows:
                 paragraphs.append(" ".join(cell.text for cell in row.cells))
-                
+
         text = "\n".join(paragraphs).strip()
         if not text:
             raise HTTPException(status_code=400, detail="No text in this Word document")

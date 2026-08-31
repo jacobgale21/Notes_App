@@ -222,3 +222,13 @@ def generate_graph(db: Session, current_user_id: uuid.UUID, notes: str) -> Graph
         print(f"Failed to generate graph: {error}")
         raise HTTPException(status_code=500, detail=f"Failed to generate graph: {error}") from error
         
+def delete_graph_endpoint(db: Session, current_user_id: uuid.UUID, id: UUID) -> None:
+    graph = db.scalar(
+        select(GraphModel)
+        .where(GraphModel.id == id, GraphModel.user_id == current_user_id)
+    )
+    if graph is None:
+        raise HTTPException(status_code=404, detail="Graph not found")
+    db.delete(graph)
+    db.commit()
+    return None

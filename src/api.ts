@@ -121,3 +121,11 @@ export const storeGraph = async (formData: FormData): Promise<Graph> => {
     throw error;
   }
 };
+
+export const deleteGraph = async (id: string) => {
+  try {
+    await api.delete(`/graph/delete/${id}`);
+  } catch (error) {
+    throw error;
+  }
+};
