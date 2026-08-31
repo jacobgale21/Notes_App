@@ -10,12 +10,12 @@ import Placeholder from "@tiptap/extension-placeholder";
 import { useNavigate } from "react-router-dom";
 import { useStoreGraph } from "../../hooks/useCatalog";
 import Loading from "../UI/loading";
+import { X } from "lucide-react";
 export default function Upload() {
   const [notes, setNotes] = useState<File | null>(null);
   const [error, setError] = useState("");
   const [selectedTab, setSelectedTab] = useState("upload");
   const navigate = useNavigate();
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const { mutate: storeGraph } = useStoreGraph();
   const { mutateAsync, isPending } = useStoreGraph();
 
@@ -28,17 +28,14 @@ export default function Upload() {
 
         formData.append("notes", notes_text);
       } else {
-        formData.append("pdf_file", pdf_file);
+        formData.append("upload_file", pdf_file);
       }
-      setIsSubmitting(true);
       const graph = await mutateAsync(formData);
       navigate(`/graph/${graph.id}`);
     } catch (error) {
       setError(
         error instanceof Error ? error.message : "An unknown error occurred",
       );
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -92,22 +89,34 @@ export default function Upload() {
           Drop in your lecture notes and we'll turn the fragments into a map you
           can actually study from.
         </p>
-        <div className="mb-5 flex gap-1 rounded-xl border border-black/70 bg-white/[.025] p-1 sm:w-fit">
-          <button
-            onClick={() => setSelectedTab("upload")}
-            className={`rounded-lg p-2 text-xs font-semibold transition ${selectedTab === "upload" ? "bg-white/[.1] text-slate-500 border-2" : "text-slate-500 hover:text-slate-300"}`}
-          >
-            <UploadCloud size={14} className="mr-2 inline" />
-            Upload file
-          </button>
-          <button
-            onClick={() => setSelectedTab("paste")}
-            className={`rounded-lg p-2 text-xs font-semibold transition ${selectedTab === "paste" ? "bg-white/[.1] text-slate-500 border-2" : "text-slate-500 hover:text-slate-300"}`}
-          >
-            <FileText size={14} className="mr-2 inline" />
-            Paste text
-          </button>
-        </div>
+
+        {notes ? (
+          <>
+            <span className="mb-5 text-danger">
+              Delete file if you want to paste text
+            </span>
+          </>
+        ) : (
+          <>
+            <div className="mb-5 flex gap-1 rounded-xl border border-black/70 bg-white/[.025] p-1 sm:w-fit">
+              <button
+                onClick={() => setSelectedTab("upload")}
+                className={`rounded-lg p-2 text-xs font-semibold transition ${selectedTab === "upload" ? "bg-white/[.1] text-slate-500 border-2" : "text-slate-500 hover:text-slate-300"}`}
+              >
+                <UploadCloud size={14} className="mr-2 inline" />
+                Upload file
+              </button>
+              <button
+                onClick={() => setSelectedTab("paste")}
+                className={`rounded-lg p-2 text-xs font-semibold transition ${selectedTab === "paste" ? "bg-white/[.1] text-slate-500 border-2" : "text-slate-500 hover:text-slate-300"}`}
+              >
+                <FileText size={14} className="mr-2 inline" />
+                Paste text
+              </button>
+            </div>
+          </>
+        )}
+
         {selectedTab === "upload" ? (
           <>
             <label className="flex w-full max-w-lg cursor-pointer flex-col items-center rounded-2xl border border-dashed border-line bg-card px-8 py-14 shadow-sm transition hover:border-accent">
@@ -133,9 +142,14 @@ export default function Upload() {
 
         {error && <p className="mt-4 text-danger">{error}</p>}
         {notes && (
-          <p className="mt-4 text-success">Selected file: {notes.name}</p>
+          <div className="flex flex-row items-center gap-2">
+            <p className="mt-4 text-success">Selected file: {notes.name}</p>
+            <button className="mt-4 w-fit" onClick={() => setNotes(null)}>
+              <X size={24} />
+            </button>
+          </div>
         )}
-        {isSubmitting ? (
+        {isPending ? (
           <Loading label="Submitting Notes..." />
         ) : (
           <Button
