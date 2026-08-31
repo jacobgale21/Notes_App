@@ -222,4 +222,3 @@ def generate_graph(db: Session, current_user_id: uuid.UUID, notes: str) -> Graph
         print(f"Failed to generate graph: {error}")
         raise HTTPException(status_code=500, detail=f"Failed to generate graph: {error}") from error
         
-

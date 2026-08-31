@@ -7,8 +7,8 @@ export function useStoreGraph() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (notes: string) => {
-      const graph = await storeGraph(notes);
+    mutationFn: async (formData: FormData) => {
+      const graph = await storeGraph(formData);
       return graph;
     },
     onSuccess: (graph: Graph) => {

@@ -113,11 +113,9 @@ export const getGraphs = async () => {
   }
 };
 
-export const storeGraph = async (notes: string): Promise<Graph> => {
+export const storeGraph = async (formData: FormData): Promise<Graph> => {
   try {
-    const { data } = await api.post<Graph>("/graph/generate", {
-      notes,
-    });
+    const { data } = await api.post<Graph>("/graph/generate", formData);
     return data;
   } catch (error) {
     throw error;

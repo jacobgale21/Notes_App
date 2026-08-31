@@ -9,20 +9,37 @@ import { FontFamily } from "@tiptap/extension-font-family";
 import Placeholder from "@tiptap/extension-placeholder";
 import { useNavigate } from "react-router-dom";
 import { useStoreGraph } from "../../hooks/useCatalog";
-
+import Loading from "../UI/loading";
 export default function Upload() {
   const [notes, setNotes] = useState<File | null>(null);
   const [error, setError] = useState("");
   const [selectedTab, setSelectedTab] = useState("upload");
   const navigate = useNavigate();
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { mutate: storeGraph } = useStoreGraph();
   const { mutateAsync, isPending } = useStoreGraph();
-  const handleSubmit = async () => {
-    const notes = editor?.getText().trim();
-    if (!notes) return;
-    const graph = await mutateAsync(notes);
-    navigate(`/graph/${graph.id}`);
+
+  const handleSubmit = async (pdf_file: File | null) => {
+    try {
+      const formData = new FormData();
+      if (!pdf_file) {
+        const notes_text = editor?.getText().trim();
+        if (!notes_text) throw new Error("No notes provided");
+
+        formData.append("notes", notes_text);
+      } else {
+        formData.append("pdf_file", pdf_file);
+      }
+      setIsSubmitting(true);
+      const graph = await mutateAsync(formData);
+      navigate(`/graph/${graph.id}`);
+    } catch (error) {
+      setError(
+        error instanceof Error ? error.message : "An unknown error occurred",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -118,14 +135,18 @@ export default function Upload() {
         {notes && (
           <p className="mt-4 text-success">Selected file: {notes.name}</p>
         )}
-        <Button
-          asChild
-          variant="brand"
-          className="mt-4 w-full max-w-lg"
-          onClick={handleSubmit}
-        >
-          Generate Knowledge Graph
-        </Button>
+        {isSubmitting ? (
+          <Loading label="Submitting Notes..." />
+        ) : (
+          <Button
+            asChild
+            variant="brand"
+            className="mt-4 w-full max-w-lg"
+            onClick={() => handleSubmit(notes)}
+          >
+            Generate Knowledge Graph
+          </Button>
+        )}
       </main>
     </div>
   );

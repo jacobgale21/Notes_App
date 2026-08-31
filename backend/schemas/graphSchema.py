@@ -3,6 +3,7 @@ from .nodeSchema import NodeSchema, NodeCreate
 from .edgeSchema import EdgeSchema, EdgeCreate
 from datetime import datetime
 from uuid import UUID
+from fastapi import UploadFile
 
 
 class GraphCreate(BaseModel):
@@ -31,3 +32,4 @@ class GraphSummary(BaseModel):
 
 class GenerateGraphRequest(BaseModel):
     notes: str
+    pdf_file: UploadFile
