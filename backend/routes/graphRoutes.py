@@ -3,7 +3,9 @@ from sqlalchemy.orm import Session
 from db import get_db
 from services.graph.graphServices import create_graph_from_json, generate_graph, get_graph_by_id, get_all_graphs, delete_graph_endpoint
 from services.graph.helper import read_pdf_file, read_word_file
+from services.graph.nodeServices import create_node_endpoint
 from schemas.graphSchema import GraphSchema, GraphSummary
+from schemas.nodeSchema import NodeCreateInput, NodeSchema
 from services.deps import get_current_user_id
 from models.userModel import User as UserModel
 from typing import List
@@ -64,3 +66,7 @@ async def generate_graph_endpoint( db: Session = Depends(get_db), current_user_i
 @router.delete("/delete/{id}")
 async def delete_graph(id: UUID, db: Session = Depends(get_db), current_user_id: uuid.UUID = Depends(get_current_user_id)):
     return delete_graph_endpoint(db, current_user_id, id)
+
+@router.post("/{graph_id}/node")
+async def create_node(graph_id: UUID, node: NodeCreateInput, db: Session = Depends(get_db), current_user_id: uuid.UUID = Depends(get_current_user_id))->NodeSchema:
+    return create_node_endpoint(db, current_user_id, graph_id, node) 

@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from .nodeSchema import NodeSchema, NodeCreate
+from .nodeSchema import NodeSchema
 from .edgeSchema import EdgeSchema, EdgeCreate
 from datetime import datetime
 from uuid import UUID
@@ -9,7 +9,7 @@ from fastapi import UploadFile
 class GraphCreate(BaseModel):
     title: str
     subject: str
-    nodes: list[NodeCreate]
+    nodes: list[NodeSchema]
     edges: list[EdgeCreate]
 
 class GraphSchema(BaseModel):

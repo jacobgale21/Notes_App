@@ -1,6 +1,6 @@
 import axios from "axios";
 import { getAccessToken, setAccessToken } from "./auth";
-import type { Graph } from "./data/types";
+import type { Graph, NodeCreateInput, User, GraphNode } from "./data/types";
 export const api = axios.create({
   baseURL: "http://localhost:8000",
   withCredentials: true, // send HttpOnly cookie on /user/refresh
@@ -41,11 +41,6 @@ export const getNotes = async () => {
   const response = await api.get("/");
   return response.data;
 };
-
-interface User {
-  email: string;
-  password: string;
-}
 
 export const signup = async (user: User) => {
   try {
@@ -125,6 +120,18 @@ export const storeGraph = async (formData: FormData): Promise<Graph> => {
 export const deleteGraph = async (id: string) => {
   try {
     await api.delete(`/graph/delete/${id}`);
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const createNode = async (node: NodeCreateInput): Promise<GraphNode> => {
+  try {
+    const { data } = await api.post<GraphNode>(
+      `/graph/${node.graph_id}/node`,
+      node,
+    );
+    return data;
   } catch (error) {
     throw error;
   }

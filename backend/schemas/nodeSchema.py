@@ -21,9 +21,8 @@ class NodeSchema(BaseModel):
     content: list[ContentBlock]
     category: str | None = None
 
-# create node schema
-class NodeCreate(BaseModel):
-    id: str
+
+class NodeCreateInput(BaseModel):
     title: str
     subtitle: str | None = None
     description: str

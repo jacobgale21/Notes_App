@@ -7,7 +7,7 @@ import {
   useEdgesState,
   Panel,
 } from "@xyflow/react";
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { NodeNode } from "./SectionNodes";
 import { toFlow } from "../../../lib/toFlow";
 import { layoutGraph } from "../../../lib/layout";
@@ -15,6 +15,8 @@ import type { NodeKind, Graph } from "../../../data/types";
 import Inspector from "./Inspector";
 import { useReactFlow } from "@xyflow/react";
 import GraphSearch from "./GraphSearch";
+import { Button } from "../button";
+import CreateNodeModel from "./createNodeModel";
 
 const nodeTypes: Record<NodeKind, typeof NodeNode> = {
   root: NodeNode,
@@ -38,9 +40,10 @@ export function NotesCanvas({
     () => toFlow(graph, layout),
     [graph, layout],
   );
-  const [nodesState, , onNodesChange] = useNodesState(initialNodes);
-  const [edges, , onEdgesChange] = useEdgesState(initialEdges);
+  const [nodesState, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const selectedNode = graph.nodes.find((n) => n.id === selectedId) ?? null;
+  const [createNodeModalOpen, setCreateNodeModalOpen] = useState(false);
 
   function focusNode(id: string) {
     onSelect(id);
@@ -53,6 +56,13 @@ export function NotesCanvas({
       });
     });
   }
+
+  useEffect(() => {
+    const nextLayout = layoutGraph(graph);
+    const flow = toFlow(graph, nextLayout);
+    setNodes(flow.nodes);
+    setEdges(flow.edges);
+  }, [graph, setNodes, setEdges]);
   return (
     <div className="flex h-full min-h-0 w-full">
       <div className="relative min-h-0 min-w-0 flex-1">
@@ -76,12 +86,27 @@ export function NotesCanvas({
               <GraphSearch graph={graph} onPick={focusNode} />
             </div>
           </Panel>
+          <Panel position="top-right" className="nopan flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => setCreateNodeModalOpen(true)}
+            >
+              Create New Node
+            </Button>
+          </Panel>
           <Background />
 
           <MiniMap position="bottom-left" />
         </ReactFlow>
       </div>
-      {selectedNode && (
+      {createNodeModalOpen && !selectedNode && (
+        <CreateNodeModel
+          onClose={() => setCreateNodeModalOpen(false)}
+          graph={graph}
+        />
+      )}
+      {selectedNode && !createNodeModalOpen && (
         <Inspector node={selectedNode} graph={graph} focusNode={focusNode} />
       )}
     </div>

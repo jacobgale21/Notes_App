@@ -1,7 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
-import { deleteGraph, getGraphById, getGraphs, storeGraph } from "../api";
+import {
+  createNode,
+  deleteGraph,
+  getGraphById,
+  getGraphs,
+  storeGraph,
+} from "../api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { Graph, GraphSummary } from "../data/types";
+import type {
+  Graph,
+  GraphSummary,
+  NodeCreateInput,
+  GraphNode,
+} from "../data/types";
 
 export function useStoreGraph() {
   const queryClient = useQueryClient();
@@ -43,6 +54,27 @@ export function useDeleteGraph() {
       queryClient.removeQueries({ queryKey: ["graphs", id] });
       queryClient.setQueryData(["graphs"], (old: GraphSummary[] | undefined) =>
         old?.filter((g) => g.id !== id),
+      );
+    },
+  });
+}
+
+export function useCreateNode() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (node_input: NodeCreateInput) => createNode(node_input),
+    onSuccess: (updatedNode: GraphNode) => {
+      queryClient.setQueryData(
+        ["graphs", updatedNode.graph_id],
+        (old: Graph | undefined) => {
+          if (!old) return old;
+          return {
+            ...old,
+            nodes: old.nodes.map((n) =>
+              n.id === updatedNode.id ? updatedNode : n,
+            ),
+          };
+        },
       );
     },
   });
