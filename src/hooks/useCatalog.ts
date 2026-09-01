@@ -66,21 +66,14 @@ export function useCreateNode() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (node_input: NodeCreateInput) => createNode(node_input),
-    onSuccess: (createdNode, variables) => {
+    onSuccess: (createdNode) => {
       queryClient.setQueryData(
-        ["graphs", variables.graph_id],
+        ["graphs", createdNode.graph_id],
         (old: Graph | undefined) => {
           if (!old) return old;
           return {
             ...old,
-            nodes: [
-              ...old.nodes,
-              {
-                ...createdNode,
-                id: String(createdNode.id),
-                graph_id: variables.graph_id,
-              },
-            ],
+            nodes: [...old.nodes, createdNode],
           };
         },
       );
@@ -92,23 +85,14 @@ export function useCreateEdge() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (edge_input: RelationCreate) => createEdge(edge_input),
-    onSuccess: (createdEdge, variables) => {
+    onSuccess: (createdEdge) => {
       queryClient.setQueryData(
-        ["graphs", variables.graph_id],
+        ["graphs", createdEdge.graph_id],
         (old: Graph | undefined) => {
           if (!old) return old;
           return {
             ...old,
-            edges: [
-              ...old.edges,
-              {
-                id: String(createdEdge.id),
-                source: String(createdEdge.source),
-                target: String(createdEdge.target),
-                rel_type: createdEdge.rel_type,
-                graph_id: variables.graph_id,
-              },
-            ],
+            edges: [...old.edges, createdEdge],
           };
         },
       );

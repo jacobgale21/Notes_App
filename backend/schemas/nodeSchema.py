@@ -20,7 +20,7 @@ class NodeSchema(BaseModel):
     type: NodeKind = Field(validation_alias="type_", serialization_alias="type")
     content: list[ContentBlock]
     category: str | None = None
-
+    graph_id: UUID
 
 class NodeCreateInput(BaseModel):
     title: str

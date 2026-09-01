@@ -9,6 +9,7 @@ class EdgeSchema(BaseModel):
     source: UUID = Field(validation_alias="source_id", serialization_alias="source")
     target: UUID = Field(validation_alias="target_id", serialization_alias="target")
     rel_type: rel_type
+    graph_id: UUID
     
 class EdgeCreate(BaseModel):
     source: str  
