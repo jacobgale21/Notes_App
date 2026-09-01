@@ -17,6 +17,9 @@ import { useReactFlow } from "@xyflow/react";
 import GraphSearch from "./GraphSearch";
 import { Button } from "../button";
 import CreateNodeModel from "./createNodeModel";
+import CreateEdge from "./createEdge";
+
+type RelType = "contains" | "related" | "depends_on";
 
 const nodeTypes: Record<NodeKind, typeof NodeNode> = {
   root: NodeNode,
@@ -44,6 +47,10 @@ export function NotesCanvas({
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const selectedNode = graph.nodes.find((n) => n.id === selectedId) ?? null;
   const [createNodeModalOpen, setCreateNodeModalOpen] = useState(false);
+  const [createEdgeModalOpen, setCreateEdgeModalOpen] = useState(false);
+  const [relType, setRelType] = useState<RelType | null>(null);
+  const [sourceId, setSourceId] = useState<string | null>(null);
+  const [targetId, setTargetId] = useState<string | null>(null);
 
   function focusNode(id: string) {
     onSelect(id);
@@ -72,8 +79,17 @@ export function NotesCanvas({
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           nodeTypes={nodeTypes}
-          onNodeClick={(_, node) => onSelect(node.id)}
-          onPaneClick={() => onSelect(null)}
+          onNodeClick={(_, node) => {
+            if (!createEdgeModalOpen) {
+              onSelect(node.id);
+              return;
+            }
+            if (!sourceId) setSourceId(node.id);
+            else if (!targetId && node.id !== sourceId) setTargetId(node.id);
+          }}
+          onPaneClick={() => {
+            if (!createEdgeModalOpen) onSelect(null);
+          }}
           fitView
           className="h-full w-full"
         >
@@ -94,19 +110,37 @@ export function NotesCanvas({
             >
               Create New Node
             </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => setCreateEdgeModalOpen(true)}
+            >
+              Create New Edge
+            </Button>
           </Panel>
           <Background />
 
           <MiniMap position="bottom-left" />
         </ReactFlow>
       </div>
-      {createNodeModalOpen && !selectedNode && (
-        <CreateNodeModel
-          onClose={() => setCreateNodeModalOpen(false)}
+      {createEdgeModalOpen && (
+        <CreateEdge
           graph={graph}
+          relType={relType ?? "contains"}
+          sourceId={sourceId ?? ""}
+          targetId={targetId ?? ""}
+          onRelType={setRelType}
+          onClearSource={() => setSourceId(null)}
+          onClearTarget={() => setTargetId(null)}
+          onClose={() => {
+            setCreateEdgeModalOpen(false);
+            setRelType(null);
+            setSourceId(null);
+            setTargetId(null);
+          }}
         />
       )}
-      {selectedNode && !createNodeModalOpen && (
+      {selectedNode && !createNodeModalOpen && !createEdgeModalOpen && (
         <Inspector node={selectedNode} graph={graph} focusNode={focusNode} />
       )}
     </div>

@@ -11,6 +11,6 @@ class EdgeSchema(BaseModel):
     rel_type: rel_type
     
 class EdgeCreate(BaseModel):
-    source: str  # slug
+    source: str  
     target: str
     rel_type: rel_type
