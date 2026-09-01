@@ -38,6 +38,14 @@ export interface Relation {
   source: string;
   target: string;
   rel_type: RelType;
+  graph_id: string;
+}
+
+export interface RelationCreate {
+  source: string;
+  target: string;
+  rel_type: RelType;
+  graph_id: string;
 }
 
 export interface Graph {

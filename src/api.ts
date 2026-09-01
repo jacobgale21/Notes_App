@@ -1,6 +1,13 @@
 import axios from "axios";
 import { getAccessToken, setAccessToken } from "./auth";
-import type { Graph, NodeCreateInput, User, GraphNode } from "./data/types";
+import type {
+  Graph,
+  NodeCreateInput,
+  User,
+  GraphNode,
+  RelationCreate,
+  Relation,
+} from "./data/types";
 export const api = axios.create({
   baseURL: "http://localhost:8000",
   withCredentials: true, // send HttpOnly cookie on /user/refresh
@@ -130,6 +137,18 @@ export const createNode = async (node: NodeCreateInput): Promise<GraphNode> => {
     const { data } = await api.post<GraphNode>(
       `/graph/${node.graph_id}/node`,
       node,
+    );
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const createEdge = async (edge: RelationCreate): Promise<Relation> => {
+  try {
+    const { data } = await api.post<Relation>(
+      `/graph/${edge.graph_id}/edge`,
+      edge,
     );
     return data;
   } catch (error) {

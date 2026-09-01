@@ -1,0 +1,36 @@
+from fastapi import HTTPException
+from models.graphModel import GraphModel
+from sqlalchemy.orm import Session
+from uuid import UUID
+import uuid
+from schemas.edgeSchema import EdgeCreate, EdgeSchema
+from models.graphModel import GraphModel
+from models.nodeModel import NodeModel
+from models.edgeModel import EdgeModel
+
+def create_edge_endpoint(db: Session, current_user_id: uuid.UUID, graph_id: UUID, edge: EdgeCreate)->EdgeSchema:
+    graph = db.get(GraphModel, graph_id)
+    if graph is None or graph.user_id != current_user_id:
+        raise HTTPException(status_code=404, detail="Graph not found or you are not the owner of the graph")
+
+    source = db.get(NodeModel, UUID(edge.source))
+    target = db.get(NodeModel, UUID(edge.target))
+    if (
+        source is None or target is None
+        or source.graph_id != graph_id
+        or target.graph_id != graph_id
+    ):
+        raise HTTPException(status_code=400, detail="Source or target not in this graph")
+    if source.id == target.id:
+        raise HTTPException(status_code=400, detail="Cannot connect a node to itself")
+
+    new_edge = EdgeModel(
+        graph_id=graph_id,
+        source_id=source.id,
+        target_id=target.id,
+        rel_type=edge.rel_type,
+    )
+    db.add(new_edge)
+    db.commit()
+    db.refresh(new_edge)
+    return EdgeSchema.model_validate(new_edge)

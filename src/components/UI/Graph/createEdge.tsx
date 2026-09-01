@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import type { Graph } from "../../../data/types";
+import type { Graph, RelationCreate } from "../../../data/types";
 import { Button } from "../button";
 import {
   ArrowDown,
@@ -9,29 +9,43 @@ import {
   Link2,
   GitBranch,
   Layers3,
+  Loader2,
 } from "lucide-react";
+import { useState } from "react";
+import { useCreateEdge } from "../../../hooks/useCatalog";
 type RelType = "contains" | "related" | "depends_on";
 export default function CreateEdge({
   graph,
-  relType,
   sourceId,
   targetId,
-  onRelType,
   onClearSource,
   onClearTarget,
   onClose,
 }: {
   graph: Graph;
-  relType: RelType;
   sourceId: string;
   targetId: string;
-  onRelType: (relType: RelType) => void;
   onClearSource: () => void;
   onClearTarget: () => void;
   onClose: () => void;
 }) {
+  const [rel_type, setRel_Type] = useState<RelType>("contains");
   const source = graph.nodes.find((n) => n.id === sourceId);
   const target = graph.nodes.find((n) => n.id === targetId);
+  const { mutate, isPending, isError, error } = useCreateEdge();
+  const handleSubmit = async () => {
+    try {
+      const newEdge: RelationCreate = {
+        source: sourceId,
+        target: targetId,
+        rel_type: rel_type,
+        graph_id: graph.id,
+      };
+      await mutate(newEdge);
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
     <AnimatePresence>
       <motion.aside
@@ -113,7 +127,7 @@ export default function CreateEdge({
               {/* Related */}
               <Button
                 variant="ghost"
-                onClick={() => onRelType("related")}
+                onClick={() => setRel_Type("related")}
                 className="
               group h-auto w-full justify-between
               rounded-lg border border-line
@@ -152,7 +166,7 @@ export default function CreateEdge({
               {/* Depends On */}
               <Button
                 variant="ghost"
-                onClick={() => onRelType("depends_on")}
+                onClick={() => setRel_Type("depends_on")}
                 className="
               group h-auto w-full justify-between
               rounded-lg border border-line
@@ -191,7 +205,7 @@ export default function CreateEdge({
               {/* Contains */}
               <Button
                 variant="ghost"
-                onClick={() => onRelType("contains")}
+                onClick={() => setRel_Type("contains")}
                 className="
               group h-auto w-full justify-between
               rounded-lg border border-line
@@ -363,12 +377,16 @@ export default function CreateEdge({
             </Button>
 
             <Button
-              type="button"
+              type="submit"
               className="flex-1"
               disabled={!source || !target}
-              //   onClick={onCreate}
+              onClick={handleSubmit}
             >
-              Create Relationship
+              {isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                "Create Relationship"
+              )}
             </Button>
           </div>
         </footer>

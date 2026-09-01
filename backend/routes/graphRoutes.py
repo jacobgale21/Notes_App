@@ -11,6 +11,8 @@ from models.userModel import User as UserModel
 from typing import List
 from uuid import UUID
 import uuid
+from services.graph.edgeServices import create_edge_endpoint
+from schemas.edgeSchema import EdgeCreate, EdgeSchema
 
 router = APIRouter(prefix="/graph", tags=["graph"])
 
@@ -70,3 +72,7 @@ async def delete_graph(id: UUID, db: Session = Depends(get_db), current_user_id:
 @router.post("/{graph_id}/node")
 async def create_node(graph_id: UUID, node: NodeCreateInput, db: Session = Depends(get_db), current_user_id: uuid.UUID = Depends(get_current_user_id))->NodeSchema:
     return create_node_endpoint(db, current_user_id, graph_id, node) 
+
+@router.post("/{graph_id}/edge")
+async def create_edge(graph_id: UUID, edge: EdgeCreate, db: Session = Depends(get_db), current_user_id: uuid.UUID = Depends(get_current_user_id))->EdgeSchema:
+    return create_edge_endpoint(db, current_user_id, graph_id, edge)

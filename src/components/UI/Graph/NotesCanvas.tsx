@@ -126,10 +126,8 @@ export function NotesCanvas({
       {createEdgeModalOpen && (
         <CreateEdge
           graph={graph}
-          relType={relType ?? "contains"}
           sourceId={sourceId ?? ""}
           targetId={targetId ?? ""}
-          onRelType={setRelType}
           onClearSource={() => setSourceId(null)}
           onClearTarget={() => setTargetId(null)}
           onClose={() => {
@@ -142,6 +140,12 @@ export function NotesCanvas({
       )}
       {selectedNode && !createNodeModalOpen && !createEdgeModalOpen && (
         <Inspector node={selectedNode} graph={graph} focusNode={focusNode} />
+      )}
+      {createNodeModalOpen && !selectedNode && (
+        <CreateNodeModel
+          graph={graph}
+          onClose={() => setCreateNodeModalOpen(false)}
+        />
       )}
     </div>
   );

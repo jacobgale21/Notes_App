@@ -60,7 +60,6 @@ export default function CreateNodeModel({
       graph_id: graph.id,
     };
     await mutate(newNode);
-    onClose();
   };
   return (
     <AnimatePresence>

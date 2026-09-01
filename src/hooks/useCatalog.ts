@@ -5,6 +5,7 @@ import {
   getGraphById,
   getGraphs,
   storeGraph,
+  createEdge,
 } from "../api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type {
@@ -12,6 +13,8 @@ import type {
   GraphSummary,
   NodeCreateInput,
   GraphNode,
+  Relation,
+  RelationCreate,
 } from "../data/types";
 
 export function useStoreGraph() {
@@ -62,17 +65,50 @@ export function useDeleteGraph() {
 export function useCreateNode() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (node_input: NodeCreateInput) => createNode(node_input),
-    onSuccess: (updatedNode: GraphNode) => {
+    mutationFn: (node_input: NodeCreateInput) => createNode(node_input),
+    onSuccess: (createdNode, variables) => {
       queryClient.setQueryData(
-        ["graphs", updatedNode.graph_id],
+        ["graphs", variables.graph_id],
         (old: Graph | undefined) => {
           if (!old) return old;
           return {
             ...old,
-            nodes: old.nodes.map((n) =>
-              n.id === updatedNode.id ? updatedNode : n,
-            ),
+            nodes: [
+              ...old.nodes,
+              {
+                ...createdNode,
+                id: String(createdNode.id),
+                graph_id: variables.graph_id,
+              },
+            ],
+          };
+        },
+      );
+    },
+  });
+}
+
+export function useCreateEdge() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (edge_input: RelationCreate) => createEdge(edge_input),
+    onSuccess: (createdEdge, variables) => {
+      queryClient.setQueryData(
+        ["graphs", variables.graph_id],
+        (old: Graph | undefined) => {
+          if (!old) return old;
+          return {
+            ...old,
+            edges: [
+              ...old.edges,
+              {
+                id: String(createdEdge.id),
+                source: String(createdEdge.source),
+                target: String(createdEdge.target),
+                rel_type: createdEdge.rel_type,
+                graph_id: variables.graph_id,
+              },
+            ],
           };
         },
       );
