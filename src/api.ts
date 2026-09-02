@@ -7,6 +7,7 @@ import type {
   GraphNode,
   RelationCreate,
   Relation,
+  NodePatchInput,
 } from "./data/types";
 export const api = axios.create({
   baseURL: "http://localhost:8000",
@@ -149,6 +150,22 @@ export const createEdge = async (edge: RelationCreate): Promise<Relation> => {
     const { data } = await api.post<Relation>(
       `/graph/${edge.graph_id}/edge`,
       edge,
+    );
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const patchNode = async (
+  graph_id: string,
+  node_id: string,
+  node: NodePatchInput,
+): Promise<GraphNode> => {
+  try {
+    const { data } = await api.patch<GraphNode>(
+      `/graph/${graph_id}/node/${node_id}`,
+      node,
     );
     return data;
   } catch (error) {

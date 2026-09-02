@@ -1,8 +1,9 @@
-import type { Graph, Node } from "../../../data/types";
+import type { Graph, Node, NodePatchInput } from "../../../data/types";
 import { motion, AnimatePresence } from "framer-motion";
 import { BookIcon, BrainIcon, Pencil, StarIcon } from "lucide-react";
 import { Button } from "../button";
 import { useEffect, useRef, useState } from "react";
+import { usePatchNode } from "../../../hooks/useCatalog";
 const studyOptions = [
   {
     icon: StarIcon,
@@ -148,14 +149,16 @@ export default function Inspector({
   node,
   graph,
   focusNode,
-  onUpdateNode,
 }: {
   node: Node;
   graph: Graph;
   focusNode: (id: string) => void;
-  onUpdateNode: (id: string, updates: Partial<Node>) => void;
 }) {
   const related = relatedNodes(graph, node.id);
+  const { mutate } = usePatchNode();
+  const handleUpdateNode = (updates: NodePatchInput) => {
+    mutate({ graph_id: graph.id, node_id: node.id, node: updates });
+  };
   return (
     <AnimatePresence>
       <motion.aside
@@ -172,11 +175,7 @@ export default function Inspector({
           <EditableField
             value={node.title}
             placeholder="Untitled concept"
-            onSave={(value) =>
-              onUpdateNode(node.id, {
-                title: value,
-              })
-            }
+            onSave={(value) => handleUpdateNode({ title: value })}
             className="
               mt-1
               px-1
@@ -193,11 +192,7 @@ export default function Inspector({
           <EditableField
             value={node.description}
             placeholder="Add description..."
-            onSave={(value) =>
-              onUpdateNode(node.id, {
-                description: value,
-              })
-            }
+            onSave={(value) => handleUpdateNode({ description: value })}
             className="p-3 text-sm leading-6 text-muted"
           />
         </div>
@@ -221,15 +216,10 @@ export default function Inspector({
                     value={bullet.text}
                     placeholder="Add key point..."
                     onSave={(value) => {
-                      const updatedContent = [...node.content];
-
-                      updatedContent[index] = {
-                        ...updatedContent[index],
-                        text: value,
-                      };
-
-                      onUpdateNode(node.id, {
-                        content: updatedContent,
+                      handleUpdateNode({
+                        content: node.content.map((b, i) =>
+                          i === index ? { ...b, text: value } : b,
+                        ),
                       });
                     }}
                     className="text-sm leading-6 text-muted"

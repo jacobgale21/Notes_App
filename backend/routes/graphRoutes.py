@@ -3,9 +3,9 @@ from sqlalchemy.orm import Session
 from db import get_db
 from services.graph.graphServices import create_graph_from_json, generate_graph, get_graph_by_id, get_all_graphs, delete_graph_endpoint
 from services.graph.helper import read_pdf_file, read_word_file
-from services.graph.nodeServices import create_node_endpoint
+from services.graph.nodeServices import create_node_endpoint, patch_node_endpoint
 from schemas.graphSchema import GraphSchema, GraphSummary
-from schemas.nodeSchema import NodeCreateInput, NodeSchema
+from schemas.nodeSchema import NodeCreateInput, NodeSchema, NodePatchInput
 from services.deps import get_current_user_id
 from models.userModel import User as UserModel
 from typing import List
@@ -76,3 +76,7 @@ async def create_node(graph_id: UUID, node: NodeCreateInput, db: Session = Depen
 @router.post("/{graph_id}/edge")
 async def create_edge(graph_id: UUID, edge: EdgeCreate, db: Session = Depends(get_db), current_user_id: uuid.UUID = Depends(get_current_user_id))->EdgeSchema:
     return create_edge_endpoint(db, current_user_id, graph_id, edge)
+
+@router.patch("/{graph_id}/node/{node_id}")
+async def patch_node(graph_id: UUID, node_id: UUID, node: NodePatchInput, db: Session = Depends(get_db), current_user_id: uuid.UUID = Depends(get_current_user_id))->NodeSchema:
+    return patch_node_endpoint(db, current_user_id, graph_id, node_id, node)

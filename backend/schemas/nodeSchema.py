@@ -29,3 +29,8 @@ class NodeCreateInput(BaseModel):
     type: NodeKind
     content: list[ContentBlock]
     category: str | None = None
+
+class NodePatchInput(BaseModel):
+    title: str | None = None
+    description: str | None = None
+    content: list[ContentBlock] | None = None

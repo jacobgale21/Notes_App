@@ -63,3 +63,15 @@ export interface GraphSummary {
   subject: string;
   updated_at: string;
 }
+
+export interface NodePatchInput {
+  title?: string;
+  description?: string;
+  content?: ContentBlock[];
+}
+
+export interface UpdateNodeVariables {
+  graph_id: string;
+  node_id: string;
+  node: NodePatchInput;
+}

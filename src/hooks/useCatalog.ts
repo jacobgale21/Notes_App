@@ -6,15 +6,15 @@ import {
   getGraphs,
   storeGraph,
   createEdge,
+  patchNode,
 } from "../api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type {
   Graph,
   GraphSummary,
   NodeCreateInput,
-  GraphNode,
-  Relation,
   RelationCreate,
+  UpdateNodeVariables,
 } from "../data/types";
 
 export function useStoreGraph() {
@@ -93,6 +93,28 @@ export function useCreateEdge() {
           return {
             ...old,
             edges: [...old.edges, createdEdge],
+          };
+        },
+      );
+    },
+  });
+}
+
+export function usePatchNode() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ graph_id, node_id, node }: UpdateNodeVariables) =>
+      patchNode(graph_id, node_id, node),
+    onSuccess: (updatedNode) => {
+      queryClient.setQueryData(
+        ["graphs", updatedNode.graph_id],
+        (old: Graph | undefined) => {
+          if (!old) return old;
+          return {
+            ...old,
+            nodes: old.nodes.map((node) =>
+              node.id === updatedNode.id ? updatedNode : node,
+            ),
           };
         },
       );
