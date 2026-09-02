@@ -32,7 +32,7 @@ export default function CreateEdge({
   const [rel_type, setRel_Type] = useState<RelType>("contains");
   const source = graph.nodes.find((n) => n.id === sourceId);
   const target = graph.nodes.find((n) => n.id === targetId);
-  const { mutate, isPending, isError, error } = useCreateEdge();
+  const { mutate, isPending } = useCreateEdge();
   const handleSubmit = async () => {
     try {
       const newEdge: RelationCreate = {

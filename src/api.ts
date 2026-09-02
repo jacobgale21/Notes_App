@@ -172,3 +172,11 @@ export const patchNode = async (
     throw error;
   }
 };
+
+export const deleteNode = async (graph_id: string, node_id: string) => {
+  try {
+    await api.delete(`/graph/${graph_id}/node/${node_id}`);
+  } catch (error) {
+    throw error;
+  }
+};

@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Depends, Form, File, UploadFile, HTTPException
+from fastapi import APIRouter, Depends, Form, File, UploadFile, HTTPException, status
 from sqlalchemy.orm import Session
 from db import get_db
 from services.graph.graphServices import create_graph_from_json, generate_graph, get_graph_by_id, get_all_graphs, delete_graph_endpoint
 from services.graph.helper import read_pdf_file, read_word_file
-from services.graph.nodeServices import create_node_endpoint, patch_node_endpoint
+from services.graph.nodeServices import create_node_endpoint, patch_node_endpoint, delete_node_endpoint
 from schemas.graphSchema import GraphSchema, GraphSummary
 from schemas.nodeSchema import NodeCreateInput, NodeSchema, NodePatchInput
 from services.deps import get_current_user_id
@@ -65,7 +65,7 @@ async def generate_graph_endpoint( db: Session = Depends(get_db), current_user_i
     # generate the graph
     return generate_graph(db, current_user_id, text)
 
-@router.delete("/delete/{id}")
+@router.delete("/delete/{id}", status_code=204)
 async def delete_graph(id: UUID, db: Session = Depends(get_db), current_user_id: uuid.UUID = Depends(get_current_user_id)):
     return delete_graph_endpoint(db, current_user_id, id)
 
@@ -80,3 +80,7 @@ async def create_edge(graph_id: UUID, edge: EdgeCreate, db: Session = Depends(ge
 @router.patch("/{graph_id}/node/{node_id}")
 async def patch_node(graph_id: UUID, node_id: UUID, node: NodePatchInput, db: Session = Depends(get_db), current_user_id: uuid.UUID = Depends(get_current_user_id))->NodeSchema:
     return patch_node_endpoint(db, current_user_id, graph_id, node_id, node)
+
+@router.delete("/{graph_id}/node/{node_id}", status_code=204)
+async def delete_node(graph_id: UUID, node_id: UUID, db: Session = Depends(get_db), current_user_id: uuid.UUID = Depends(get_current_user_id))->None:
+    return delete_node_endpoint(db, current_user_id, graph_id, node_id)

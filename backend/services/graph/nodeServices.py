@@ -43,3 +43,17 @@ def patch_node_endpoint(db: Session, current_user_id: uuid.UUID, graph_id: UUID,
     db.commit()
     db.refresh(node_model)
     return NodeSchema.model_validate(node_model)
+
+def delete_node_endpoint(db: Session, current_user_id: uuid.UUID, graph_id: UUID, node_id: UUID) -> None:
+    node_model = db.get(NodeModel, node_id)
+    graph = db.get(GraphModel, graph_id)
+    if (
+        node_model is None
+        or graph is None
+        or node_model.graph_id != graph_id
+        or graph.user_id != current_user_id
+    ):
+        raise HTTPException(status_code=404, detail="Node not found")
+    db.delete(node_model)
+    db.commit()
+    return None

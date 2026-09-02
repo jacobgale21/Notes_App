@@ -1,9 +1,9 @@
 import type { Graph, Node, NodePatchInput } from "../../../data/types";
 import { motion, AnimatePresence } from "framer-motion";
-import { BookIcon, BrainIcon, Pencil, StarIcon } from "lucide-react";
+import { BookIcon, BrainIcon, Pencil, StarIcon, TrashIcon } from "lucide-react";
 import { Button } from "../button";
 import { useEffect, useRef, useState } from "react";
-import { usePatchNode } from "../../../hooks/useCatalog";
+import { useDeleteNode, usePatchNode } from "../../../hooks/useCatalog";
 const studyOptions = [
   {
     icon: StarIcon,
@@ -156,8 +156,12 @@ export default function Inspector({
 }) {
   const related = relatedNodes(graph, node.id);
   const { mutate } = usePatchNode();
+  const { mutate: deleteNode } = useDeleteNode();
   const handleUpdateNode = (updates: NodePatchInput) => {
     mutate({ graph_id: graph.id, node_id: node.id, node: updates });
+  };
+  const handleDeleteNode = () => {
+    deleteNode(node);
   };
   return (
     <AnimatePresence>
@@ -266,6 +270,14 @@ export default function Inspector({
             </Button>
           </div>
         ))}
+        <Button
+          variant="destructive"
+          className="text-sm text-muted flex flex-row items-center justify-start gap-2 px-5 py-2 hover:bg-paper w-8/9 mx-auto"
+          onClick={handleDeleteNode}
+        >
+          <TrashIcon className="w-4 h-4" />
+          <span>Delete</span>
+        </Button>
       </motion.aside>
     </AnimatePresence>
   );
