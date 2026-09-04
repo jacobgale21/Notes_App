@@ -76,8 +76,8 @@ export interface UpdateNodeVariables {
   node: NodePatchInput;
 }
 
-export interface EdgePatchInput {
+export interface RelationPatchInput {
   rel_type?: RelType;
-  source?: string;
-  target?: string;
+  source_id?: string;
+  target_id?: string;
 }

@@ -3,7 +3,7 @@ from models.graphModel import GraphModel
 from sqlalchemy.orm import Session
 from uuid import UUID
 import uuid
-from schemas.edgeSchema import EdgeCreate, EdgeSchema
+from schemas.edgeSchema import EdgeCreate, EdgeSchema, EdgePatchInput
 from models.graphModel import GraphModel
 from models.nodeModel import NodeModel
 from models.edgeModel import EdgeModel
@@ -45,3 +45,21 @@ def delete_edge_endpoint(db: Session, current_user_id: uuid.UUID, graph_id: UUID
     db.delete(edge)
     db.commit()
     return None
+
+def patch_edge_endpoint(db: Session, current_user_id: uuid.UUID, graph_id: UUID, edge_id: UUID, edge: EdgePatchInput)->EdgeSchema:
+    graph = db.get(GraphModel, graph_id)
+    edge_model = db.get(EdgeModel, edge_id)
+    if (
+    graph is None
+    or graph.user_id != current_user_id
+    or edge_model is None
+    or edge_model.graph_id != graph_id
+    ):
+        raise HTTPException(status_code=404, detail="Graph or edge not found or you are not the owner of the graph")
+   
+    data = edge.model_dump(exclude_unset=True)
+    for key, value in data.items():
+        setattr(edge_model, key, value)
+    db.commit()
+    db.refresh(edge_model)
+    return EdgeSchema.model_validate(edge_model)

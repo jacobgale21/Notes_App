@@ -9,6 +9,7 @@ import {
   patchNode,
   deleteNode,
   deleteEdge,
+  patchEdge,
 } from "../api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type {
@@ -18,7 +19,7 @@ import type {
   RelationCreate,
   UpdateNodeVariables,
   GraphNode,
-  Relation,
+  RelationPatchInput,
 } from "../data/types";
 
 export function useStoreGraph() {
@@ -166,6 +167,35 @@ export function useDeleteEdge() {
           return {
             ...old,
             edges: old.edges.filter((e) => e.id !== deleted.edge_id),
+          };
+        },
+      );
+    },
+  });
+}
+
+export function usePatchEdge() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      graph_id,
+      edge_id,
+      edge,
+    }: {
+      graph_id: string;
+      edge_id: string;
+      edge: RelationPatchInput;
+    }) => patchEdge(graph_id, edge_id, edge),
+    onSuccess: (updatedEdge) => {
+      queryClient.setQueryData(
+        ["graphs", updatedEdge.graph_id],
+        (old: Graph | undefined) => {
+          if (!old) return old;
+          return {
+            ...old,
+            edges: old.edges.map((edge) =>
+              edge.id === updatedEdge.id ? updatedEdge : edge,
+            ),
           };
         },
       );

@@ -8,6 +8,7 @@ import type {
   RelationCreate,
   Relation,
   NodePatchInput,
+  RelationPatchInput,
 } from "./data/types";
 export const api = axios.create({
   baseURL: "http://localhost:8000",
@@ -184,6 +185,22 @@ export const deleteNode = async (graph_id: string, node_id: string) => {
 export const deleteEdge = async (graph_id: string, edge_id: string) => {
   try {
     await api.delete(`/graph/${graph_id}/edge/${edge_id}`);
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const patchEdge = async (
+  graph_id: string,
+  edge_id: string,
+  edge: RelationPatchInput,
+): Promise<Relation> => {
+  try {
+    const { data } = await api.patch<Relation>(
+      `/graph/${graph_id}/edge/${edge_id}`,
+      edge,
+    );
+    return data;
   } catch (error) {
     throw error;
   }

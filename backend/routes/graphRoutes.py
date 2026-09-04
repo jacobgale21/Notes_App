@@ -11,8 +11,8 @@ from models.userModel import User as UserModel
 from typing import List
 from uuid import UUID
 import uuid
-from services.graph.edgeServices import create_edge_endpoint, delete_edge_endpoint
-from schemas.edgeSchema import EdgeCreate, EdgeSchema
+from services.graph.edgeServices import create_edge_endpoint, delete_edge_endpoint, patch_edge_endpoint
+from schemas.edgeSchema import EdgeCreate, EdgeSchema, EdgePatchInput
 
 router = APIRouter(prefix="/graph", tags=["graph"])
 
@@ -88,3 +88,7 @@ async def delete_node(graph_id: UUID, node_id: UUID, db: Session = Depends(get_d
 @router.delete("/{graph_id}/edge/{edge_id}", status_code=204)
 async def delete_edge(graph_id: UUID, edge_id: UUID, db: Session = Depends(get_db), current_user_id: uuid.UUID = Depends(get_current_user_id))->None:
     return delete_edge_endpoint(db, current_user_id, graph_id, edge_id)
+
+@router.patch("/{graph_id}/edge/{edge_id}")
+async def patch_edge(graph_id: UUID, edge_id: UUID, edge: EdgePatchInput, db: Session = Depends(get_db), current_user_id: uuid.UUID = Depends(get_current_user_id))->EdgeSchema:
+    return patch_edge_endpoint(db, current_user_id, graph_id, edge_id, edge)

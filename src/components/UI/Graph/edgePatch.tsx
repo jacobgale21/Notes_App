@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import type { Graph, Relation } from "../../../data/types";
+import type { Graph, Relation, RelationPatchInput } from "../../../data/types";
 import { Button } from "../button";
 import {
   ArrowDown,
@@ -9,9 +9,9 @@ import {
   Link2,
   GitBranch,
   Layers3,
-  Loader2,
 } from "lucide-react";
 import { useState } from "react";
+import { useDeleteEdge, usePatchEdge } from "../../../hooks/useCatalog";
 type RelType = "contains" | "related" | "depends_on";
 export default function EdgePatch({
   graph,
@@ -25,8 +25,26 @@ export default function EdgePatch({
   const [rel_type, setRel_Type] = useState<RelType>(edge.rel_type);
   const [source, setSource] = useState<string>(edge.source);
   const [target, setTarget] = useState<string>(edge.target);
-  const currentSource = graph.nodes.find((n) => n.id === source);
-  const currentDestination = graph.nodes.find((n) => n.id === target);
+  const { mutate: patchEdge } = usePatchEdge();
+  const { mutate: deleteEdge } = useDeleteEdge();
+  const handleDelete = () => {
+    deleteEdge({
+      graph_id: graph.id,
+      edge_id: edge.id,
+    });
+  };
+  const handleSubmit = () => {
+    const patch: RelationPatchInput = {};
+    if (rel_type !== edge.rel_type) patch.rel_type = rel_type;
+    if (source !== edge.source) patch.source_id = source;
+    if (target !== edge.target) patch.target_id = target;
+    if (Object.keys(patch).length === 0) return;
+    patchEdge({
+      graph_id: graph.id,
+      edge_id: edge.id,
+      edge: patch,
+    });
+  };
 
   return (
     <AnimatePresence>
@@ -163,122 +181,6 @@ export default function EdgePatch({
                   </Button>
                 );
               })}
-              {/* Related */}
-              {/* <Button
-                variant="ghost"
-                onClick={() => setRel_Type("related")}
-                className="
-              group h-auto w-full justify-between
-              rounded-lg border border-line
-              bg-paper
-              px-3 py-3
-              text-left
-              hover:border-accent/40
-              hover:bg-accent/5
-            "
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className="
-                flex h-9 w-9 items-center justify-center
-                rounded-md bg-muted/10
-                text-muted
-                group-hover:bg-accent/10
-                group-hover:text-accent
-              "
-                  >
-                    <ArrowRight className="h-4 w-4" />
-                  </div>
-
-                  <div>
-                    <p className="text-sm font-medium text-ink">Related</p>
-
-                    <p className="mt-0.5 text-xs text-muted">
-                      General connection
-                    </p>
-                  </div>
-                </div>
-
-                <ChevronRight className="h-4 w-4 text-muted/50" />
-              </Button>
-
-              {/* Depends On */}
-              {/* <Button
-                variant="ghost"
-                onClick={() => setRel_Type("depends_on")}
-                className="
-              group h-auto w-full justify-between
-              rounded-lg border border-line
-              bg-paper
-              px-3 py-3
-              text-left
-              hover:border-accent/40
-              hover:bg-accent/5
-            "
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className="
-                flex h-9 w-9 items-center justify-center
-                rounded-md bg-muted/10
-                text-muted
-                group-hover:bg-accent/10
-                group-hover:text-accent
-              "
-                  >
-                    <GitBranch className="h-4 w-4" />
-                  </div>
-
-                  <div>
-                    <p className="text-sm font-medium text-ink">Depends On</p>
-
-                    <p className="mt-0.5 text-xs text-muted">
-                      Requires another node
-                    </p>
-                  </div>
-                </div>
-
-                <ChevronRight className="h-4 w-4 text-muted/50" />
-              </Button> */}
-
-              {/* Contains */}
-              {/* <Button
-                variant="ghost"
-                onClick={() => setRel_Type("contains")}
-                className="
-              group h-auto w-full justify-between
-              rounded-lg border border-line
-              bg-paper
-              px-3 py-3
-              text-left
-              hover:border-accent/40
-              hover:bg-accent/5
-            "
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className="
-                flex h-9 w-9 items-center justify-center
-                rounded-md bg-muted/10
-                text-muted
-                group-hover:bg-accent/10
-                group-hover:text-accent
-              "
-                  >
-                    <Layers3 className="h-4 w-4" />
-                  </div>
-
-                  <div>
-                    <p className="text-sm font-medium text-ink">Contains</p>
-
-                    <p className="mt-0.5 text-xs text-muted">
-                      Groups another node
-                    </p>
-                  </div>
-                </div>
-
-                <ChevronRight className="h-4 w-4 text-muted/50" /> 
-               </Button> */}
             </div>
           </section>
 
@@ -397,7 +299,11 @@ export default function EdgePatch({
               </div>
             </div>
           </section>
-          <Button variant="destructive" className=" mt-4 w-full">
+          <Button
+            variant="destructive"
+            className=" mt-4 w-full"
+            onClick={handleDelete}
+          >
             Delete Relationship
           </Button>
         </div>
@@ -428,6 +334,7 @@ export default function EdgePatch({
               type="submit"
               className="flex-1"
               disabled={!source || !target}
+              onClick={handleSubmit}
             >
               Save
             </Button>
