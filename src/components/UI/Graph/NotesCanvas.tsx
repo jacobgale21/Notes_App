@@ -18,6 +18,7 @@ import GraphSearch from "./GraphSearch";
 import { Button } from "../button";
 import CreateNodeModel from "./createNodeModel";
 import CreateEdge from "./createEdge";
+import EdgePatch from "./edgePatch";
 
 type RelType = "contains" | "related" | "depends_on";
 
@@ -51,6 +52,8 @@ export function NotesCanvas({
   const [relType, setRelType] = useState<RelType | null>(null);
   const [sourceId, setSourceId] = useState<string | null>(null);
   const [targetId, setTargetId] = useState<string | null>(null);
+  const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
+  const selectedEdge = graph.edges.find((e) => e.id === selectedEdgeId) ?? null;
 
   function focusNode(id: string) {
     onSelect(id);
@@ -79,7 +82,13 @@ export function NotesCanvas({
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           nodeTypes={nodeTypes}
+          onEdgeClick={(_, edge) => {
+            if (createEdgeModalOpen) return;
+            onSelect(null);
+            setSelectedEdgeId(edge.id);
+          }}
           onNodeClick={(_, node) => {
+            setSelectedEdgeId(null);
             if (!createEdgeModalOpen) {
               onSelect(node.id);
               return;
@@ -88,7 +97,10 @@ export function NotesCanvas({
             else if (!targetId && node.id !== sourceId) setTargetId(node.id);
           }}
           onPaneClick={() => {
-            if (!createEdgeModalOpen) onSelect(null);
+            if (!createEdgeModalOpen) {
+              onSelect(null);
+              setSelectedEdgeId(null);
+            }
           }}
           fitView
           className="h-full w-full"
@@ -138,10 +150,20 @@ export function NotesCanvas({
           }}
         />
       )}
-      {selectedNode && !createNodeModalOpen && !createEdgeModalOpen && (
-        <Inspector node={selectedNode} graph={graph} focusNode={focusNode} />
+      {selectedEdge && !createEdgeModalOpen && (
+        <EdgePatch
+          graph={graph}
+          edge={selectedEdge}
+          onClose={() => setSelectedEdgeId(null)}
+        />
       )}
-      {createNodeModalOpen && !selectedNode && (
+      {selectedNode &&
+        !selectedEdge &&
+        !createNodeModalOpen &&
+        !createEdgeModalOpen && (
+          <Inspector node={selectedNode} graph={graph} focusNode={focusNode} />
+        )}
+      {createNodeModalOpen && !selectedNode && !selectedEdge && (
         <CreateNodeModel
           graph={graph}
           onClose={() => setCreateNodeModalOpen(false)}
