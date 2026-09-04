@@ -1,4 +1,9 @@
-import type { Graph, Node, NodePatchInput } from "../../../data/types";
+import type {
+  Graph,
+  Node,
+  NodePatchInput,
+  Relation,
+} from "../../../data/types";
 import { motion, AnimatePresence } from "framer-motion";
 import { BookIcon, BrainIcon, Pencil, StarIcon, TrashIcon } from "lucide-react";
 import { Button } from "../button";
@@ -19,13 +24,22 @@ const studyOptions = [
   },
 ];
 
-function relatedNodes(graph: Graph, nodeId: string): Node[] {
-  const ids = new Set<string>();
+type RelatedEdge = {
+  edge: Relation;
+  source: Node;
+  target: Node;
+};
+function relatedEdges(graph: Graph, nodeId: string): RelatedEdge[] {
+  const byId = new Map(graph.nodes.map((n) => [n.id, n]));
+  const out: RelatedEdge[] = [];
   for (const edge of graph.edges) {
-    if (edge.source === nodeId) ids.add(edge.target);
-    if (edge.target === nodeId) ids.add(edge.source);
+    if (edge.source !== nodeId && edge.target !== nodeId) continue;
+    const source = byId.get(edge.source);
+    const target = byId.get(edge.target);
+    if (!source || !target) continue;
+    out.push({ edge, source, target });
   }
-  return graph.nodes.filter((n) => ids.has(n.id));
+  return out;
 }
 
 function EditableField({
@@ -154,7 +168,7 @@ export default function Inspector({
   graph: Graph;
   focusNode: (id: string) => void;
 }) {
-  const related = relatedNodes(graph, node.id);
+  const related = relatedEdges(graph, node.id);
   const { mutate } = usePatchNode();
   const { mutate: deleteNode } = useDeleteNode();
   const handleUpdateNode = (updates: NodePatchInput) => {
@@ -239,20 +253,45 @@ export default function Inspector({
           <h4 className="text-md font-medium text-muted px-5 py-2">
             Related Topics
           </h4>
-          <div className="flex flex-row items-center justify-start gap-2 px-5">
-            {related.length
-              ? related.map((topic) => {
-                  return (
-                    <span
-                      key={topic.id}
-                      className="text-sm text-muted shadow-sm rounded-md px-2 py-1 bg-paper cursor-pointer"
-                      onClick={() => focusNode(topic.id)}
-                    >
-                      {topic.title}
+          <div className="flex flex-col gap-2 px-5">
+            {related.length ? (
+              related.map((rel) => (
+                <div
+                  key={rel.edge.id}
+                  className="flex w-full items-center gap-2 rounded-md bg-paper px-2 py-1.5 shadow-sm"
+                >
+                  <button
+                    type="button"
+                    className="min-w-0 flex-1 text-left text-sm text-muted"
+                    onClick={() =>
+                      focusNode(
+                        rel.source.id === node.id
+                          ? rel.target.id
+                          : rel.source.id,
+                      )
+                    }
+                  >
+                    <span className="block truncate font-medium text-ink">
+                      {rel.source.title}
                     </span>
-                  );
-                })
-              : "No related topics"}
+                    <span className="block text-xs text-muted">
+                      {rel.edge.rel_type.replace("_", " ")} → {rel.target.title}
+                    </span>
+                  </button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 shrink-0 text-muted hover:text-destructive"
+                    aria-label="Delete relationship"
+                  >
+                    <TrashIcon className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-muted/60">No related topics</p>
+            )}
           </div>
         </section>
         <h4 className="text-md font-medium text-muted px-5 pt-4">Study</h4>
