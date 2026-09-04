@@ -14,8 +14,14 @@ const edgeLooks: Record<
     style: { stroke: "#78716c", strokeWidth: 1.5, strokeDasharray: "6 4" },
   },
   depends_on: {
-    markerEnd: { type: MarkerType.ArrowClosed, width: 16, height: 16 },
-    style: { stroke: "#ffffff", strokeWidth: 2 },
+    label: "depends on",
+    markerEnd: {
+      type: MarkerType.ArrowClosed,
+      width: 16,
+      height: 16,
+      color: "#c2410c",
+    },
+    style: { stroke: "#c2410c", strokeWidth: 2 },
   },
 };
 export function toFlow(graph: Graph, layout: Positioned) {
@@ -29,7 +35,7 @@ export function toFlow(graph: Graph, layout: Positioned) {
     id: r.id,
     source: r.source,
     target: r.target,
-    type: "smoothstep",
+    type: r.rel_type === "contains" ? "smoothstep" : "default",
     ...edgeLooks[r.rel_type],
   }));
   return { nodes: flowNodes, edges };
