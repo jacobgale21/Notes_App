@@ -8,6 +8,7 @@ import {
   createEdge,
   patchNode,
   deleteNode,
+  deleteEdge,
 } from "../api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type {
@@ -17,6 +18,7 @@ import type {
   RelationCreate,
   UpdateNodeVariables,
   GraphNode,
+  Relation,
 } from "../data/types";
 
 export function useStoreGraph() {
@@ -139,6 +141,31 @@ export function useDeleteNode() {
             edges: old.edges.filter(
               (e) => e.source !== deleted.id && e.target !== deleted.id,
             ),
+          };
+        },
+      );
+    },
+  });
+}
+
+export function useDeleteEdge() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      graph_id,
+      edge_id,
+    }: {
+      graph_id: string;
+      edge_id: string;
+    }) => deleteEdge(graph_id, edge_id),
+    onSuccess: (_data, deleted) => {
+      queryClient.setQueryData(
+        ["graphs", deleted.graph_id],
+        (old: Graph | undefined) => {
+          if (!old) return old;
+          return {
+            ...old,
+            edges: old.edges.filter((e) => e.id !== deleted.edge_id),
           };
         },
       );

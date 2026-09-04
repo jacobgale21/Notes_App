@@ -34,3 +34,14 @@ def create_edge_endpoint(db: Session, current_user_id: uuid.UUID, graph_id: UUID
     db.commit()
     db.refresh(new_edge)
     return EdgeSchema.model_validate(new_edge)
+
+def delete_edge_endpoint(db: Session, current_user_id: uuid.UUID, graph_id: UUID, edge_id: UUID)->None:
+    graph = db.get(GraphModel, graph_id)
+    if graph is None or graph.user_id != current_user_id:
+        raise HTTPException(status_code=404, detail="Graph not found or you are not the owner of the graph")
+    edge = db.get(EdgeModel, edge_id)
+    if edge is None or edge.graph_id != graph_id:
+        raise HTTPException(status_code=404, detail="Edge not found or you are not the owner of the graph")
+    db.delete(edge)
+    db.commit()
+    return None

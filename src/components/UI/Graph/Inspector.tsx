@@ -8,7 +8,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { BookIcon, BrainIcon, Pencil, StarIcon, TrashIcon } from "lucide-react";
 import { Button } from "../button";
 import { useEffect, useRef, useState } from "react";
-import { useDeleteNode, usePatchNode } from "../../../hooks/useCatalog";
+import {
+  useDeleteEdge,
+  useDeleteNode,
+  usePatchNode,
+} from "../../../hooks/useCatalog";
 const studyOptions = [
   {
     icon: StarIcon,
@@ -177,6 +181,16 @@ export default function Inspector({
   const handleDeleteNode = () => {
     deleteNode(node);
   };
+  const { mutate: deleteEdge } = useDeleteEdge();
+  const handleDeleteEdge = ({
+    graph_id,
+    edge_id,
+  }: {
+    graph_id: string;
+    edge_id: string;
+  }) => {
+    deleteEdge({ graph_id, edge_id });
+  };
   return (
     <AnimatePresence>
       <motion.aside
@@ -284,6 +298,12 @@ export default function Inspector({
                     size="icon"
                     className="h-8 w-8 shrink-0 text-muted hover:text-destructive"
                     aria-label="Delete relationship"
+                    onClick={() =>
+                      handleDeleteEdge({
+                        graph_id: graph.id,
+                        edge_id: rel.edge.id,
+                      })
+                    }
                   >
                     <TrashIcon className="h-4 w-4" />
                   </Button>

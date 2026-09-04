@@ -180,3 +180,11 @@ export const deleteNode = async (graph_id: string, node_id: string) => {
     throw error;
   }
 };
+
+export const deleteEdge = async (graph_id: string, edge_id: string) => {
+  try {
+    await api.delete(`/graph/${graph_id}/edge/${edge_id}`);
+  } catch (error) {
+    throw error;
+  }
+};
