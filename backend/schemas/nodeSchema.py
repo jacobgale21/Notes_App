@@ -34,3 +34,12 @@ class NodePatchInput(BaseModel):
     title: str | None = None
     description: str | None = None
     content: list[ContentBlock] | None = None
+
+class NodeLLMInput(BaseModel):
+    id: str 
+    title: str
+    subtitle: str | None = None
+    description: str
+    type: NodeKind
+    content: list[ContentBlock]
+    category: str | None = None

@@ -51,6 +51,8 @@ export default function Upload() {
       "application/pdf",
       "application/msword",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "image/jpeg",
+      "image/png",
     ];
 
     if (validTypes.includes(file.type)) {
@@ -122,7 +124,7 @@ export default function Upload() {
             <label className="flex w-full max-w-lg cursor-pointer flex-col items-center rounded-2xl border border-dashed border-line bg-card px-8 py-14 shadow-sm transition hover:border-accent">
               <span className="text-lg">Drop file here</span>
               <span className="mt-1 text-sm text-muted">
-                or click to browse · PDF, DOC, DOCX
+                or click to browse · PDF, DOC, DOCX, JPEG, PNG
               </span>
               <input
                 type="file"

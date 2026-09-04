@@ -27,7 +27,7 @@ const edgeLooks: Record<
 export function toFlow(graph: Graph, layout: Positioned) {
   const flowNodes = graph.nodes.map((node) => ({
     id: node.id,
-    type: node.type, // must match nodeTypes key
+    type: node.type,
     position: layout[node.id] ?? { x: 0, y: 0 },
     data: node,
   }));

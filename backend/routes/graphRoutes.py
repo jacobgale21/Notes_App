@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Form, File, UploadFile, HTTPException, status
 from sqlalchemy.orm import Session
 from db import get_db
-from services.graph.graphServices import create_graph_from_json, generate_graph, get_graph_by_id, get_all_graphs, delete_graph_endpoint
+from services.graph.graphServices import create_graph_from_json, generate_graph, get_graph_by_id, get_all_graphs, delete_graph_endpoint, read_image_file, generate_graph_from_image
 from services.graph.helper import read_pdf_file, read_word_file
 from services.graph.nodeServices import create_node_endpoint, patch_node_endpoint, delete_node_endpoint
 from schemas.graphSchema import GraphSchema, GraphSummary
@@ -53,6 +53,9 @@ async def generate_graph_endpoint( db: Session = Depends(get_db), current_user_i
             or name.endswith(".docx")
         ):
             text = read_word_file(upload_file)
+        elif ctype.startswith("image/") or name.endswith((".jpg", ".jpeg", ".png", ".webp")):
+            image_bytes, mime = read_image_file(upload_file)
+            return generate_graph_from_image(db, current_user_id, [(image_bytes, mime)])
         else:
             raise HTTPException(400, "Unsupported file type")
 

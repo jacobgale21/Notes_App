@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import List
 from sqlalchemy.orm import Session, selectinload
-from fastapi import HTTPException, Response, status
+from fastapi import HTTPException, Response, status, UploadFile
 from sqlalchemy import select, desc
 import json
 from models.userModel import User as UserModel
@@ -16,6 +16,78 @@ from google.genai import types
 import os
 from dotenv import load_dotenv
 load_dotenv()
+
+
+system_prompt = """
+You convert a student's lecture notes into only oneknowledge graph for studying.
+
+Return a one, single JSON object that matches this shape (no markdown, no commentary):
+
+{
+  "title": string,
+  "subject": string,
+  "nodes": [Node],
+  "edges": [Edge]
+}
+
+Node:
+{
+  "id": string,              // unique slug, e.g. "cpu", "instruction-cycle"
+  "title": string,           // short display name
+  "subtitle": string | null, // optional expansion of the title
+  "description": string,     // one sentence: what this idea is
+  "type": "root" | "topic" | "concept",
+  "category": string | null, // optional grouping label, e.g. "Hardware"
+  "content": [ContentBlock]
+}
+
+ContentBlock:
+{
+  "id": string,              // "{node-id}-1", "{node-id}-2", ...
+  "type": "text" | "definition" | "equation",
+  "text": string             // one study-ready fact, not a paragraph
+}
+
+Edge:
+{
+  "source": string,          // a node id
+  "target": string,          // a node id
+  "rel_type": "contains" | "related" | "depends_on"
+}
+
+STRUCTURE
+- Exactly one node with type "root". Its title should match the graph title (the overall subject of the notes).
+- Topics are major sections or headings. Concepts are specific terms, mechanisms, or facts under a topic.
+- Prefer a shallow tree: root → topics → concepts. Depth of 2-3 is enough.
+- Aim for about 8-25 nodes unless the notes are very short or very long.
+- Every non-root node must be reachable from the root by following "contains" edges.
+
+EDGES
+- "contains": parent has child as a part/subtopic (root contains topics, topics contain concepts). Direction is parent → child.
+- "related": two nodes are associated but neither contains the other. Use sparingly.
+- "depends_on": target is needed to understand source (source depends on target). Example: "instruction-cycle" depends_on "cpi" only if the notes actually say that.
+- Do not create cycles in "contains".
+- Every edge source and target must be an existing node id.
+- No duplicate edges (same source, target, and rel_type).
+- No self-edges.
+
+IDS
+- Node ids: lowercase kebab-case slugs from the title ("Central Processing Unit" → "cpu" or "central-processing-unit"). Unique across the graph.
+- Never use UUIDs. Never reuse an id.
+- Content block ids: "{node-id}-1", "{node-id}-2", …
+
+CONTENT QUALITY
+- Pull only from the notes. Do not invent facts, examples, or topics that are not present or clearly implied.
+- Ignore page numbers, "week 3", homework reminders, and other logistics unless they are the subject.
+- description: one clear sentence.
+- content: 2-5 bullets per node. Each bullet is one idea, ~8-20 words.
+  - "text": normal key points
+  - "definition": formal "X is …" wording when the notes define a term
+  - "equation": formulas, identities, or symbolic relations, kept as the notes wrote them
+- title/subject: infer a concise course-style title and a broad subject (e.g. "Computer Science").
+
+If the notes are messy, still produce a single, valid graph: group related fragments under topics, drop pure noise, and keep edges conservative.
+"""
 
 
 TEST_JSON = Path(__file__).resolve().parent.parent / "test" / "test.json"
@@ -119,77 +191,7 @@ def get_graph_by_id(db: Session, current_user_id: uuid.UUID, id: UUID) -> GraphS
 
 # Use LLM to generate Graph from Notes
 def create_graph(notes: str) -> GraphCreate:
-    # Code here
-    system_prompt = """
-You convert a student's lecture notes into only oneknowledge graph for studying.
-
-Return a one, single JSON object that matches this shape (no markdown, no commentary):
-
-{
-  "title": string,
-  "subject": string,
-  "nodes": [Node],
-  "edges": [Edge]
-}
-
-Node:
-{
-  "id": string,              // unique slug, e.g. "cpu", "instruction-cycle"
-  "title": string,           // short display name
-  "subtitle": string | null, // optional expansion of the title
-  "description": string,     // one sentence: what this idea is
-  "type": "root" | "topic" | "concept",
-  "category": string | null, // optional grouping label, e.g. "Hardware"
-  "content": [ContentBlock]
-}
-
-ContentBlock:
-{
-  "id": string,              // "{node-id}-1", "{node-id}-2", ...
-  "type": "text" | "definition" | "equation",
-  "text": string             // one study-ready fact, not a paragraph
-}
-
-Edge:
-{
-  "source": string,          // a node id
-  "target": string,          // a node id
-  "rel_type": "contains" | "related" | "depends_on"
-}
-
-STRUCTURE
-- Exactly one node with type "root". Its title should match the graph title (the overall subject of the notes).
-- Topics are major sections or headings. Concepts are specific terms, mechanisms, or facts under a topic.
-- Prefer a shallow tree: root → topics → concepts. Depth of 2-3 is enough.
-- Aim for about 8-25 nodes unless the notes are very short or very long.
-- Every non-root node must be reachable from the root by following "contains" edges.
-
-EDGES
-- "contains": parent has child as a part/subtopic (root contains topics, topics contain concepts). Direction is parent → child.
-- "related": two nodes are associated but neither contains the other. Use sparingly.
-- "depends_on": target is needed to understand source (source depends on target). Example: "instruction-cycle" depends_on "cpi" only if the notes actually say that.
-- Do not create cycles in "contains".
-- Every edge source and target must be an existing node id.
-- No duplicate edges (same source, target, and rel_type).
-- No self-edges.
-
-IDS
-- Node ids: lowercase kebab-case slugs from the title ("Central Processing Unit" → "cpu" or "central-processing-unit"). Unique across the graph.
-- Never use UUIDs. Never reuse an id.
-- Content block ids: "{node-id}-1", "{node-id}-2", …
-
-CONTENT QUALITY
-- Pull only from the notes. Do not invent facts, examples, or topics that are not present or clearly implied.
-- Ignore page numbers, "week 3", homework reminders, and other logistics unless they are the subject.
-- description: one clear sentence.
-- content: 2-5 bullets per node. Each bullet is one idea, ~8-20 words.
-  - "text": normal key points
-  - "definition": formal "X is …" wording when the notes define a term
-  - "equation": formulas, identities, or symbolic relations, kept as the notes wrote them
-- title/subject: infer a concise course-style title and a broad subject (e.g. "Computer Science").
-
-If the notes are messy, still produce a single, valid graph: group related fragments under topics, drop pure noise, and keep edges conservative.
-"""
+    
     client = genai.Client(api_key=os.getenv("LLM_KEY"))
     chat = client.chats.create(
         model="gemini-3.6-flash",
@@ -232,3 +234,61 @@ def delete_graph_endpoint(db: Session, current_user_id: uuid.UUID, id: UUID) -> 
     db.delete(graph)
     db.commit()
     return None
+
+ALLOWED_IMAGE_TYPES = {
+    "image/jpeg": {".jpg", ".jpeg"},
+    "image/png": {".png"},
+    "image/webp": {".webp"},
+}
+MAX_IMAGE_BYTES = 8 * 1024 * 1024  # 8 MB
+
+def read_image_file(image_file: UploadFile) -> tuple[bytes, str]:
+    name = (image_file.filename or "").lower()
+    ctype = (image_file.content_type or "").lower()
+    if ctype not in ALLOWED_IMAGE_TYPES and not any(
+        name.endswith(ext) for exts in ALLOWED_IMAGE_TYPES.values() for ext in exts
+    ):
+        raise HTTPException(status_code=400, detail="File must be a JPEG, PNG, or WebP")
+
+    data = image_file.file.read()
+    if not data:
+        raise HTTPException(status_code=400, detail="Empty file")
+    if len(data) > MAX_IMAGE_BYTES:
+        raise HTTPException(status_code=400, detail="Image is too large")
+    mime = ctype if ctype in ALLOWED_IMAGE_TYPES else (
+        "image/jpeg" if name.endswith((".jpg", ".jpeg"))
+        else "image/png" if name.endswith(".png")
+        else "image/webp"
+    )
+    return data, mime
+
+def generate_graph_from_image(db: Session, current_user_id: uuid.UUID, images: list[tuple[bytes, str]]) -> GraphSchema:
+    client = genai.Client(api_key=os.getenv("LLM_KEY"))
+    parts: list = [system_prompt]
+    for data, mime in images:  
+        parts.append(types.Part.from_bytes(data=data, mime_type=mime))
+    parts.append(
+        "These images are pages of the same handwritten notes, in order. "
+        "Read the writing and diagrams. Pull a graph only from what is visible. "
+        "Do not invent topics you cannot see."
+    )
+    chat = client.chats.create(
+        model="gemini-3.6-flash",
+        config=types.GenerateContentConfig(
+            response_mime_type="application/json",
+            response_schema=GraphCreate
+        )
+    )
+    response = chat.send_message(parts)
+    if response.text is None:
+        raise HTTPException(status_code=500, detail="Failed to generate graph from images")
+    payload = GraphCreate.model_validate_json(response.text)
+    graph = store_graph(payload, db, current_user_id)
+    loaded = db.scalar(
+        select(GraphModel)
+        .options(selectinload(GraphModel.nodes), selectinload(GraphModel.edges))
+        .where(GraphModel.id == graph.id)
+    )
+    if loaded is None:
+        raise HTTPException(status_code=500, detail="Failed to reload graph")
+    return GraphSchema.model_validate(loaded)
