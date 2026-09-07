@@ -7,7 +7,8 @@ import jwt
 import os
 from datetime import datetime, timezone, timedelta
 from fastapi import HTTPException, Response
-
+import dotenv
+dotenv.load_dotenv()
 ph = PasswordHasher()
 
 REFRESH_COOKIE = "refresh_token"
@@ -73,16 +74,16 @@ def set_refresh_cookie(response: Response, token: str) -> None:
         key=REFRESH_COOKIE,
         value=token,
         httponly=True,       
-        secure=False,        
+        secure=os.getenv("COOKIE_SECURE") == "true",        
         samesite="lax",
         max_age=7 * 24 * 60 * 60,
-        path="/user",        
+        path="/",
     )
 
 def clear_refresh_cookie(response: Response) -> None:
     response.delete_cookie(
         key=REFRESH_COOKIE,
-        path="/user",
+        path="/",
         samesite="lax",
-        secure=False,
+        secure=os.getenv("COOKIE_SECURE") == "true",
     )

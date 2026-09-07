@@ -129,7 +129,7 @@ export default function Upload() {
               <input
                 type="file"
                 className="sr-only"
-                accept="..."
+                accept=".pdf,.doc,.docx,image/jpeg,image/png,image/webp"
                 onChange={handleFileChange}
               />
             </label>

@@ -11,8 +11,8 @@ import type {
   RelationPatchInput,
 } from "./data/types";
 export const api = axios.create({
-  baseURL: "http://localhost:8000",
-  withCredentials: true, // send HttpOnly cookie on /user/refresh
+  baseURL: "/api",
+  withCredentials: true,
 });
 
 api.interceptors.request.use((config) => {
