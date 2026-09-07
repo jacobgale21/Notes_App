@@ -1,7 +1,9 @@
-import type { Graph, RelType } from "../data/types";
+import type { Graph, GraphNode, NodeKind, RelType } from "../data/types";
 import type { Positioned } from "./layout";
 
-import { MarkerType, type Edge } from "@xyflow/react";
+import { MarkerType, type Edge, type Node as FlowNode } from "@xyflow/react";
+
+export type CanvasNode = FlowNode<GraphNode, NodeKind>;
 const edgeLooks: Record<
   RelType,
   Pick<Edge, "style" | "animated" | "label" | "markerEnd">
@@ -24,14 +26,17 @@ const edgeLooks: Record<
     style: { stroke: "#c2410c", strokeWidth: 2 },
   },
 };
-export function toFlow(graph: Graph, layout: Positioned) {
-  const flowNodes = graph.nodes.map((node) => ({
+export function toFlow(
+  graph: Graph,
+  layout: Positioned,
+): { nodes: CanvasNode[]; edges: Edge[] } {
+  const flowNodes: CanvasNode[] = graph.nodes.map((node) => ({
     id: node.id,
     type: node.type,
     position: layout[node.id] ?? { x: 0, y: 0 },
     data: node,
   }));
-  const edges = graph.edges.map((r) => ({
+  const edges: Edge[] = graph.edges.map((r) => ({
     id: r.id,
     source: r.source,
     target: r.target,

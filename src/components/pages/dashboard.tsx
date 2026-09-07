@@ -12,9 +12,7 @@ import {
 import Header from "../UI/header";
 import { useDeleteGraph, useGetGraphs } from "../../hooks/useCatalog";
 import type { GraphSummary } from "../../data/types";
-import { useState } from "react";
 import { formatUpdatedAt } from "../../lib/format";
-import { useMutation } from "@tanstack/react-query";
 // Placeholder data for the dashboard: will fetch from the user database when developed
 const placeholderData = [
   {
@@ -41,8 +39,8 @@ const placeholderData = [
 
 export default function Dashboard() {
   const { data: graphs } = useGetGraphs();
-  const [numberOfGraphs, setNumberOfGraphs] = useState(graphs?.length ?? 0);
-  const { mutate, isPending, isError, error } = useDeleteGraph();
+  const numberOfGraphs = graphs?.length ?? 0;
+  const { mutate, isPending } = useDeleteGraph();
   const navigate = useNavigate();
 
   return (

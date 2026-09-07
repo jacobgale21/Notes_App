@@ -143,7 +143,6 @@ export default function EdgePatch({
                   Icon: Layers3,
                 },
               ].map(({ id, title, hint, Icon }) => {
-                const selected = rel_type === id;
                 return (
                   <Button
                     type="button"

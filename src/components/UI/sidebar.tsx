@@ -8,10 +8,10 @@ import {
   Settings,
 } from "lucide-react";
 import { Button } from "./button";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { logout } from "../../api";
 import { useGetGraphs } from "../../hooks/useCatalog";
-import type { Graph } from "../../data/types";
+import type { GraphSummary } from "../../data/types";
 const allButtons = [
   {
     icon: Home,
@@ -45,10 +45,9 @@ const allButtons = [
   },
 ];
 export default function Sidebar() {
-  const navigate = useNavigate();
   const { data: graphs } = useGetGraphs();
   const sections = new Set<string>(
-    graphs?.map((graph: Graph) => graph.subject) ?? [],
+    graphs?.map((graph: GraphSummary) => graph.subject) ?? [],
   );
   return (
     <div className="flex flex-col h-full border-r border-black/50 p-4 gap-4">

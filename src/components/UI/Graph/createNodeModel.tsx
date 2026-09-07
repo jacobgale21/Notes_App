@@ -22,7 +22,7 @@ export default function CreateNodeModel({
   const [description, setDescription] = useState("");
   const [titleContent, setTitleContent] = useState([""]);
   const [content, setContent] = useState([""]);
-  const { mutate, isPending, isError, error } = useCreateNode();
+  const { mutate, isPending } = useCreateNode();
 
   const handleTitleContentChange = (index: number, value: string) => {
     const newInputs = [...titleContent];

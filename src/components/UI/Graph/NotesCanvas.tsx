@@ -9,7 +9,7 @@ import {
 } from "@xyflow/react";
 import { useMemo, useState, useEffect } from "react";
 import { NodeNode } from "./SectionNodes";
-import { toFlow } from "../../../lib/toFlow";
+import { toFlow, type CanvasNode } from "../../../lib/toFlow";
 import { layoutGraph } from "../../../lib/layout";
 import type { NodeKind, Graph } from "../../../data/types";
 import Inspector from "./Inspector";
@@ -19,8 +19,6 @@ import { Button } from "../button";
 import CreateNodeModel from "./createNodeModel";
 import CreateEdge from "./createEdge";
 import EdgePatch from "./edgePatch";
-
-type RelType = "contains" | "related" | "depends_on";
 
 const nodeTypes: Record<NodeKind, typeof NodeNode> = {
   root: NodeNode,
@@ -44,12 +42,13 @@ export function NotesCanvas({
     () => toFlow(graph, layout),
     [graph, layout],
   );
-  const [nodesState, setNodes, onNodesChange] = useNodesState(initialNodes);
+
+  const [nodesState, setNodes, onNodesChange] =
+    useNodesState<CanvasNode>(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const selectedNode = graph.nodes.find((n) => n.id === selectedId) ?? null;
   const [createNodeModalOpen, setCreateNodeModalOpen] = useState(false);
   const [createEdgeModalOpen, setCreateEdgeModalOpen] = useState(false);
-  const [relType, setRelType] = useState<RelType | null>(null);
   const [sourceId, setSourceId] = useState<string | null>(null);
   const [targetId, setTargetId] = useState<string | null>(null);
   const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
@@ -76,7 +75,7 @@ export function NotesCanvas({
   return (
     <div className="flex h-full min-h-0 w-full">
       <div className="relative min-h-0 min-w-0 flex-1">
-        <ReactFlow
+        <ReactFlow<CanvasNode>
           nodes={nodesState}
           edges={edges}
           onNodesChange={onNodesChange}
@@ -144,7 +143,6 @@ export function NotesCanvas({
           onClearTarget={() => setTargetId(null)}
           onClose={() => {
             setCreateEdgeModalOpen(false);
-            setRelType(null);
             setSourceId(null);
             setTargetId(null);
           }}

@@ -13,16 +13,16 @@ export interface ContentBlock {
   text: string;
 }
 
-export interface GraphNode {
+export type GraphNode = {
   id: string;
   title: string;
-  subtitle?: string | undefined;
+  subtitle?: string;
   description: string;
   type: NodeKind;
   graph_id: string;
   content: ContentBlock[];
   category?: string;
-}
+};
 export type Node = GraphNode;
 
 export interface NodeCreateInput {

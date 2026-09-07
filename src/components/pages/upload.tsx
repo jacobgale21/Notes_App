@@ -16,7 +16,6 @@ export default function Upload() {
   const [error, setError] = useState("");
   const [selectedTab, setSelectedTab] = useState("upload");
   const navigate = useNavigate();
-  const { mutate: storeGraph } = useStoreGraph();
   const { mutateAsync, isPending } = useStoreGraph();
 
   const handleSubmit = async (pdf_file: File | null) => {
