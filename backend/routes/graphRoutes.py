@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Form, File, UploadFile, HTTPException, status
 from sqlalchemy.orm import Session
 from db import get_db
-from services.graph.graphServices import create_graph_from_json, generate_graph, get_graph_by_id, get_all_graphs, delete_graph_endpoint, read_image_file, generate_graph_from_image
+from services.graph.graphServices import create_graph_from_json, generate_graph, get_graph_by_id, get_all_graphs, delete_graph_endpoint, read_image_file, generate_graph_from_parts, system_prompt
 from services.graph.helper import read_pdf_file, read_word_file
 from services.graph.nodeServices import create_node_endpoint, patch_node_endpoint, delete_node_endpoint
 from schemas.graphSchema import GraphSchema, GraphSummary
@@ -35,38 +35,51 @@ async def get_graphs(db: Session = Depends(get_db), current_user_id: uuid.UUID =
 async def get_graph(id: UUID, db: Session = Depends(get_db), current_user_id: uuid.UUID = Depends(get_current_user_id)):
     return get_graph_by_id(db, current_user_id, id)
 
+from google.genai import types
+
+# ...
+
 @router.post("/generate")
-async def generate_graph_endpoint( db: Session = Depends(get_db), current_user_id: uuid.UUID = Depends(get_current_user_id), notes: str | None = Form(None), upload_file: UploadFile | None = File(None))->GraphSchema:
-    # check if both notes and upload_file are provided, throw an error
-    if notes and upload_file and upload_file.filename:
-        raise HTTPException(400, "Send either notes or a PDF, not both")
+async def generate_graph_endpoint(
+    db: Session = Depends(get_db),
+    current_user_id: uuid.UUID = Depends(get_current_user_id),
+    notes: str | None = Form(None),
+    upload_files: list[UploadFile] = File(default=[]),
+) -> GraphSchema:
+    files = [f for f in upload_files if f.filename]
+    if notes and notes.strip() and files:
+        raise HTTPException(400, "Send either notes or files, not both")
 
-    # read the file, determine the type of file and read the text
-    if upload_file is not None and upload_file.filename:
-        name = (upload_file.filename or "").lower()
-        ctype = upload_file.content_type or ""
+    parts: list = [system_prompt]  
 
-        if ctype in ("application/pdf", "application/x-pdf") or name.endswith(".pdf"):
-            text = read_pdf_file(upload_file)
-        elif (
-            "wordprocessingml" in ctype
-            or name.endswith(".docx")
-        ):
-            text = read_word_file(upload_file)
-        elif ctype.startswith("image/") or name.endswith((".jpg", ".jpeg", ".png", ".webp")):
-            image_bytes, mime = read_image_file(upload_file)
-            return generate_graph_from_image(db, current_user_id, [(image_bytes, mime)])
-        else:
-            raise HTTPException(400, "Unsupported file type")
+    if files:
+        for upload_file in files:
+            name = (upload_file.filename or "").lower()
+            ctype = (upload_file.content_type or "").lower()
 
-    # if notes are provided through textbox, read the text
-    elif notes and notes.strip():
-        text = notes.strip()
-    else:
-        raise HTTPException(400, "No notes or PDF file provided")
+            if ctype in ("application/pdf", "application/x-pdf") or name.endswith(".pdf"):
+                text = read_pdf_file(upload_file)
+                parts.append(f"\n\n--- file: {upload_file.filename} ---\n\n{text}")
+            elif "wordprocessingml" in ctype or name.endswith(".docx"):
+                text = read_word_file(upload_file)
+                parts.append(f"\n\n--- file: {upload_file.filename} ---\n\n{text}")
+            elif ctype.startswith("image/") or name.endswith((".jpg", ".jpeg", ".png", ".webp")):
+                data, mime = read_image_file(upload_file)
+                parts.append(types.Part.from_bytes(data=data, mime_type=mime))
+            else:
+                raise HTTPException(400, f"Unsupported file type: {upload_file.filename}")
 
-    # generate the graph
-    return generate_graph(db, current_user_id, text)
+        parts.append(
+            "These files are pages of the same notes, in the order given. "
+            "Text files are already extracted. Images are handwritten or photographed pages. "
+            "Pull a graph only from what is present. Do not invent topics."
+        )
+        return generate_graph_from_parts(db, current_user_id, parts)
+
+    if notes and notes.strip():
+        return generate_graph(db, current_user_id, notes.strip())
+
+    raise HTTPException(400, "No notes or files provided")
 
 @router.delete("/delete/{id}", status_code=204)
 async def delete_graph(id: UUID, db: Session = Depends(get_db), current_user_id: uuid.UUID = Depends(get_current_user_id)):

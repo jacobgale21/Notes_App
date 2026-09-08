@@ -81,3 +81,4 @@ export interface RelationPatchInput {
   source_id?: string;
   target_id?: string;
 }
+export type StagedFile = { id: string; file: File };

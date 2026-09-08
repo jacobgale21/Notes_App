@@ -73,8 +73,8 @@ def set_refresh_cookie(response: Response, token: str) -> None:
     response.set_cookie(
         key=REFRESH_COOKIE,
         value=token,
-        httponly=True,       
-        secure=os.getenv("COOKIE_SECURE") == "true",        
+        httponly=True,
+        secure=os.getenv("COOKIE_SECURE") == "true",
         samesite="lax",
         max_age=7 * 24 * 60 * 60,
         path="/",

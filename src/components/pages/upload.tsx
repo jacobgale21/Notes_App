@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { UploadCloud, FileText } from "lucide-react";
+import { UploadCloud, FileText, ChevronDown } from "lucide-react";
 import "@xyflow/react/dist/style.css";
 import { Button } from "../UI/button";
 import { useEditor, EditorContent } from "@tiptap/react";
@@ -10,24 +10,28 @@ import Placeholder from "@tiptap/extension-placeholder";
 import { useNavigate } from "react-router-dom";
 import { useStoreGraph } from "../../hooks/useCatalog";
 import Loading from "../UI/loading";
-import { X } from "lucide-react";
+import { X, ChevronUp } from "lucide-react";
+import type { StagedFile } from "../../data/types";
+
 export default function Upload() {
-  const [notes, setNotes] = useState<File | null>(null);
+  const [notes, setNotes] = useState<StagedFile[]>([]);
   const [error, setError] = useState("");
   const [selectedTab, setSelectedTab] = useState("upload");
   const navigate = useNavigate();
   const { mutateAsync, isPending } = useStoreGraph();
 
-  const handleSubmit = async (pdf_file: File | null) => {
+  const handleSubmit = async (notes: StagedFile[]) => {
     try {
       const formData = new FormData();
-      if (!pdf_file) {
+
+      if (notes.length === 0) {
         const notes_text = editor?.getText().trim();
         if (!notes_text) throw new Error("No notes provided");
-
         formData.append("notes", notes_text);
       } else {
-        formData.append("upload_file", pdf_file);
+        for (const { file } of notes) {
+          formData.append("upload_files", file);
+        }
       }
       const graph = await mutateAsync(formData);
       navigate(`/graph/${graph.id}`);
@@ -41,7 +45,7 @@ export default function Upload() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) {
-      setNotes(null);
+      setNotes([]);
       setError("Please select a valid PDF or Word document.");
       return;
     }
@@ -53,14 +57,17 @@ export default function Upload() {
       "image/jpeg",
       "image/png",
     ];
-
+    const id =
+      globalThis.crypto?.randomUUID?.() ??
+      `${Date.now()}-${file.name}-${Math.random().toString(16).slice(2)}`;
     if (validTypes.includes(file.type)) {
-      setNotes(file);
+      setNotes((prev) => [...prev, { id, file }]);
       setError("");
     } else {
-      setNotes(null);
+      setNotes((prev) => prev.filter((n) => n.id !== id));
       setError("Please select a valid PDF or Word document.");
     }
+    if (e.target) e.target.value = "";
   };
   const editor = useEditor({
     extensions: [
@@ -80,6 +87,16 @@ export default function Upload() {
     },
   });
 
+  const move = (index: number, delta: -1 | 1) => {
+    setNotes((prev) => {
+      const next = [...prev];
+      const target = index + delta;
+      if (target < 0 || target >= next.length) return prev;
+      [next[index], next[target]] = [next[target], next[index]];
+      return next;
+    });
+  };
+
   return (
     <div className="flex min-h-screen flex-col bg-paper text-ink">
       <main className="flex flex-1 flex-col items-center justify-center px-4 pb-16">
@@ -91,7 +108,7 @@ export default function Upload() {
           can actually study from.
         </p>
 
-        {notes ? (
+        {notes.length > 0 ? (
           <>
             <span className="mb-5 text-danger">
               Delete file if you want to paste text
@@ -128,6 +145,7 @@ export default function Upload() {
               <input
                 type="file"
                 className="sr-only"
+                multiple
                 accept=".pdf,.doc,.docx,image/jpeg,image/png,image/webp"
                 onChange={handleFileChange}
               />
@@ -142,12 +160,56 @@ export default function Upload() {
         )}
 
         {error && <p className="mt-4 text-danger">{error}</p>}
-        {notes && (
-          <div className="flex flex-row items-center gap-2">
-            <p className="mt-4 text-success">Selected file: {notes.name}</p>
-            <button className="mt-4 w-fit" onClick={() => setNotes(null)}>
-              <X size={24} />
-            </button>
+        {notes.length > 0 && (
+          <div className="mt-4 w-full max-w-lg">
+            <p className="mb-2 text-sm text-muted">
+              {notes.length} file{notes.length === 1 ? "" : "s"} · processed in
+              this order
+            </p>
+            <ul className="flex flex-col gap-2">
+              {notes.map((note, index) => (
+                <li
+                  key={note.id}
+                  className="flex items-center gap-2 rounded-xl border border-line bg-card px-3 py-2"
+                >
+                  <span className="w-6 shrink-0 text-sm text-muted">
+                    {index + 1}
+                  </span>
+                  <FileText size={16} className="shrink-0" />
+                  <span
+                    className="min-w-0 flex-1 truncate"
+                    title={note.file.name}
+                  >
+                    {note.file.name}
+                  </span>
+                  <button
+                    type="button"
+                    disabled={index === 0}
+                    onClick={() => move(index, -1)}
+                    aria-label="Move up"
+                  >
+                    <ChevronUp size={18} />
+                  </button>
+                  <button
+                    type="button"
+                    disabled={index === notes.length - 1}
+                    onClick={() => move(index, 1)}
+                    aria-label="Move down"
+                  >
+                    <ChevronDown size={18} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setNotes((prev) => prev.filter((n) => n.id !== note.id))
+                    }
+                    aria-label={`Remove ${note.file.name}`}
+                  >
+                    <X size={18} />
+                  </button>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
         {isPending ? (

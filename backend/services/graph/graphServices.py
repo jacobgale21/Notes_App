@@ -206,23 +206,40 @@ def create_graph(notes: str) -> GraphCreate:
     payload = GraphCreate.model_validate_json(response.text)
     return payload
 
-def generate_graph(db: Session, current_user_id: uuid.UUID, notes: str) -> GraphSchema:
-    try:
-        if notes is None or notes == "":
-            print("Notes are required")
-            raise HTTPException(status_code=400, detail="Notes are required")
-        elif len(notes) > 20000:
-            print("Notes are too long")
-            raise HTTPException(status_code=400, detail="Notes are too long")
-        else:
-            # Generate Graph from Notes with LLM
-            payload = create_graph(notes)
-            graph = store_graph(payload, db, current_user_id)
-            return GraphSchema.model_validate(graph)
+def generate_graph_from_parts(
+    db: Session,
+    current_user_id: uuid.UUID,
+    user_parts: list,  # str | types.Part
+) -> GraphSchema:
+    client = genai.Client(api_key=os.getenv("LLM_KEY"))
+    parts: list = [system_prompt, *user_parts]
+    chat = client.chats.create(
+        model="gemini-3.6-flash",
+        config=types.GenerateContentConfig(
+            response_mime_type="application/json",
+            response_schema=GraphCreate,
+        ),
+    )
+    response = chat.send_message(parts)
+    if response.text is None:
+        raise HTTPException(status_code=500, detail="Failed to generate graph")
+    payload = GraphCreate.model_validate_json(response.text)
+    graph = store_graph(payload, db, current_user_id)
+    loaded = db.scalar(
+        select(GraphModel)
+        .options(selectinload(GraphModel.nodes), selectinload(GraphModel.edges))
+        .where(GraphModel.id == graph.id)
+    )
+    if loaded is None:
+        raise HTTPException(status_code=500, detail="Failed to reload graph")
+    return GraphSchema.model_validate(loaded)
 
-    except Exception as error:
-        print(f"Failed to generate graph: {error}")
-        raise HTTPException(status_code=500, detail=f"Failed to generate graph: {error}") from error
+def generate_graph(db, current_user_id, notes: str) -> GraphSchema:
+    if not notes:
+        raise HTTPException(400, "Notes are required")
+    if len(notes) > 50000:
+        raise HTTPException(400, "Notes are too long")
+    return generate_graph_from_parts(db, current_user_id, [notes])
         
 def delete_graph_endpoint(db: Session, current_user_id: uuid.UUID, id: UUID) -> None:
     graph = db.scalar(
@@ -261,34 +278,3 @@ def read_image_file(image_file: UploadFile) -> tuple[bytes, str]:
         else "image/webp"
     )
     return data, mime
-
-def generate_graph_from_image(db: Session, current_user_id: uuid.UUID, images: list[tuple[bytes, str]]) -> GraphSchema:
-    client = genai.Client(api_key=os.getenv("LLM_KEY"))
-    parts: list = [system_prompt]
-    for data, mime in images:  
-        parts.append(types.Part.from_bytes(data=data, mime_type=mime))
-    parts.append(
-        "These images are pages of the same handwritten notes, in order. "
-        "Read the writing and diagrams. Pull a graph only from what is visible. "
-        "Do not invent topics you cannot see."
-    )
-    chat = client.chats.create(
-        model="gemini-3.6-flash",
-        config=types.GenerateContentConfig(
-            response_mime_type="application/json",
-            response_schema=GraphCreate
-        )
-    )
-    response = chat.send_message(parts)
-    if response.text is None:
-        raise HTTPException(status_code=500, detail="Failed to generate graph from images")
-    payload = GraphCreate.model_validate_json(response.text)
-    graph = store_graph(payload, db, current_user_id)
-    loaded = db.scalar(
-        select(GraphModel)
-        .options(selectinload(GraphModel.nodes), selectinload(GraphModel.edges))
-        .where(GraphModel.id == graph.id)
-    )
-    if loaded is None:
-        raise HTTPException(status_code=500, detail="Failed to reload graph")
-    return GraphSchema.model_validate(loaded)
